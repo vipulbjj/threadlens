@@ -95,7 +95,7 @@ export default function ChatAnalyticsPage() {
       });
 
       const data = await res.json();
-      if (data.reply) {
+      if (res.ok && data.reply) {
         setChatHistory((prev) => [
           ...prev, 
           { 
@@ -105,10 +105,10 @@ export default function ChatAnalyticsPage() {
           }
         ]);
       } else {
-        setChatHistory((prev) => [...prev, { role: "assistant", content: "Sorry, I encountered an error analyzing the chat." }]);
+        setChatHistory((prev) => [...prev, { role: "assistant", content: `Error: ${data.error || "Unknown error occurred"}` }]);
       }
-    } catch (e) {
-      setChatHistory((prev) => [...prev, { role: "assistant", content: "Error connecting to AI." }]);
+    } catch (e: any) {
+      setChatHistory((prev) => [...prev, { role: "assistant", content: `Error connecting to AI: ${e.message}` }]);
     }
 
     setIsTyping(false);

@@ -30,7 +30,7 @@ Here is the conversation context:
 ${chatContext}`;
 
     const completion = await openai.chat.completions.create({
-      model: 'grok-beta', // or grok-2-latest if applicable
+      model: 'grok-4.20-0309-non-reasoning', // Using the latest supported xAI model
       messages: [
         { role: 'system', content: systemPrompt },
         ...messages.map((m: any) => ({ role: m.role, content: m.content })),
