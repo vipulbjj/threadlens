@@ -6,12 +6,15 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { UploadCloud, FileText, CheckCircle2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Progress } from "@/components/ui/progress";
+import { parseWhatsAppChat } from "@/lib/parser";
+import { useChatStore } from "@/lib/store";
 
 export default function UploadPage() {
   const [file, setFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [progress, setProgress] = useState(0);
   const router = useRouter();
+  const setChat = useChatStore((state) => state.setChat);
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
     if (acceptedFiles.length > 0) {
@@ -30,13 +33,25 @@ export default function UploadPage() {
 
   const handleUpload = async (uploadedFile: File) => {
     setIsUploading(true);
-    // Simulate upload and parse progress
-    for (let i = 0; i <= 100; i += 10) {
-      setProgress(i);
-      await new Promise((resolve) => setTimeout(resolve, 200));
+    setProgress(20);
+    
+    try {
+      const text = await uploadedFile.text();
+      setProgress(50);
+      
+      const parsedMessages = parseWhatsAppChat(text);
+      setProgress(80);
+      
+      setChat(uploadedFile.name, parsedMessages);
+      setProgress(100);
+      
+      setTimeout(() => {
+        router.push("/chat/demo-1");
+      }, 500);
+    } catch (e) {
+      console.error("Failed to parse", e);
+      setIsUploading(false);
     }
-    // Navigate to a demo chat
-    router.push("/chat/demo-1");
   };
 
   return (
@@ -57,7 +72,7 @@ export default function UploadPage() {
               <input {...getInputProps()} />
               <UploadCloud className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
               <h3 className="text-lg font-semibold">Click or drag file to this area</h3>
-              <p className="text-sm text-muted-foreground mt-2">Strictly privacy-first. We do not store your raw files.</p>
+              <p className="text-sm text-muted-foreground mt-2">Strictly privacy-first. We do not store your raw files. Everything happens locally in your browser.</p>
             </div>
           ) : (
             <div className="space-y-6">
@@ -72,7 +87,7 @@ export default function UploadPage() {
               {isUploading && (
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
-                    <span>Parsing messages...</span>
+                    <span>Parsing messages locally...</span>
                     <span>{progress}%</span>
                   </div>
                   <Progress value={progress} className="h-2" />

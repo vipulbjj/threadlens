@@ -28,7 +28,7 @@ export default function LandingPage() {
                 <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl">
                   Understand what your <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-blue-500">conversations actually say.</span>
                 </h1>
-                <p className="mx-auto max-w-[700px] text-muted-foreground md:text-xl">
+                <p className="mx-auto max-w-[700px] text-muted-foreground md:text-xl font-medium">
                   Upload WhatsApp chats. Ask AI questions. Discover patterns hidden in communication. ThreadLens brings emotional intelligence to your chat exports.
                 </p>
               </div>
