@@ -21,7 +21,7 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center p-6 md:p-12">
+    <div className="min-h-screen flex flex-col items-center justify-center p-6 md:p-12">
       <div className="w-full max-w-6xl flex items-center justify-between mb-8">
         <div>
           <h2 className="text-4xl font-bold tracking-tight bg-gradient-to-br from-white to-white/60 bg-clip-text text-transparent">Overview</h2>
