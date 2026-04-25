@@ -1,8 +1,4 @@
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { ArrowRight, MessageSquare, Shield, Zap } from "lucide-react";
-
-import Link from "next/link";
 import { ArrowRight, MessageSquare, Shield, Zap, Sparkles, BarChart3, Lock } from "lucide-react";
 
 export default function LandingPage() {
