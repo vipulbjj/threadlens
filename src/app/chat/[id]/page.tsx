@@ -84,13 +84,19 @@ export default function ChatAnalyticsPage() {
     setIsTyping(true);
 
     try {
+      // Format chat on frontend to avoid Vercel 4.5MB request payload limits
+      const chatContext = parsedChat
+        .slice(-10000)
+        .map((m: any) => `[${m.date} ${m.time}] ${m.sender}: ${m.message}`)
+        .join('\n');
+
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           query: userMsg.content,
           messages: chatHistory.filter(m => m.role !== "system"),
-          parsedChat: parsedChat
+          chatContext: chatContext
         })
       });
 

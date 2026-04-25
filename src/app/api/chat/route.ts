@@ -9,16 +9,11 @@ const openai = new OpenAI({
 
 export async function POST(req: Request) {
   try {
-    const { query, messages, parsedChat } = await req.json();
+    const { query, messages, chatContext } = await req.json();
 
     if (!query) {
       return NextResponse.json({ error: 'Query is required' }, { status: 400 });
     }
-
-    // Convert parsed chat to a string format for the context
-    // We limit to the last 10,000 messages to ensure it fits comfortably in Grok's 128k context window.
-    // 10,000 WhatsApp messages is typically ~100k tokens.
-    const chatContext = parsedChat.slice(-10000).map((m: any) => `[${m.date} ${m.time}] ${m.sender}: ${m.message}`).join('\n');
 
     const systemPrompt = `You are ThreadLens AI, an emotional intelligence and relationship analytics assistant. 
 You are given a raw WhatsApp chat transcript between two or more people.
