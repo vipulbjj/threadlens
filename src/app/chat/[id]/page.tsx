@@ -56,10 +56,36 @@ export default function ChatAnalyticsPage() {
         maxMsgs = count;
         peakHour = parseInt(h);
       }
-    }
-
-    const peakAmPm = peakHour >= 12 ? "PM" : "AM";
     const peakHour12 = peakHour % 12 === 0 ? 12 : peakHour % 12;
+    const peakAmPm = peakHour >= 12 ? "PM" : "AM";
+    const positiveWords = new Set(["love", "great", "awesome", "good", "happy", "yes", "haha", "lol", "beautiful", "amazing", "thanks", "thank", "perfect", "cool", "sweet", "cute", "fun", "lmao", "yay"]);
+    const negativeWords = new Set(["bad", "sad", "hate", "angry", "mad", "no", "sorry", "ugh", "annoying", "terrible", "awful", "stupid", "dumb", "worst", "unfortunately", "cry", "crying", "miss"]);
+
+    const chunkSize = Math.max(1, Math.ceil(parsedChat.length / 3));
+    const chunks = [
+      parsedChat.slice(0, chunkSize),
+      parsedChat.slice(chunkSize, chunkSize * 2),
+      parsedChat.slice(chunkSize * 2)
+    ];
+
+    const sentimentTrend = chunks.map((chunk, i) => {
+      let positive = 0;
+      let negative = 0;
+      chunk.forEach(m => {
+        const words = m.message.toLowerCase().split(/[^a-z]+/);
+        words.forEach(w => {
+          if (positiveWords.has(w)) positive++;
+          if (negativeWords.has(w)) negative++;
+        });
+      });
+      
+      // Add a small baseline to prevent 0 rendering flatlines
+      return {
+        time: i === 0 ? "Start" : i === 1 ? "Mid" : "End",
+        positive: positive + 1,
+        negative: negative + 1
+      };
+    });
 
     return {
       sender1,
@@ -67,14 +93,9 @@ export default function ChatAnalyticsPage() {
       msgsSender1,
       msgsSender2,
       peakTime: `${peakHour12}:00 ${peakAmPm}`,
+      sentimentTrend
     };
   }, [parsedChat]);
-
-  const mockSentimentData = [
-    { time: "Start", positive: 40, negative: 10 },
-    { time: "Mid", positive: 50, negative: 15 },
-    { time: "End", positive: 70, negative: 5 },
-  ];
 
   const handleAsk = async () => {
     if (!query) return;
@@ -190,12 +211,12 @@ export default function ChatAnalyticsPage() {
             <Card className="col-span-2 bg-secondary/40 backdrop-blur-xl border-border/50 shadow-2xl">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium flex items-center text-muted-foreground">
-                  <TrendingUp className="h-4 w-4 mr-2" /> Sentiment Trend (Simulated)
+                  <TrendingUp className="h-4 w-4 mr-2" /> Sentiment Trend (Local Analysis)
                 </CardTitle>
               </CardHeader>
               <CardContent className="h-[220px] w-full pt-4">
                 <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={mockSentimentData}>
+                  <LineChart data={analytics?.sentimentTrend || []}>
                     <XAxis dataKey="time" stroke="#888888" fontSize={12} tickLine={false} axisLine={false} />
                     <YAxis stroke="#888888" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `${value}`} />
                     <RechartsTooltip contentStyle={{ backgroundColor: '#09090b', borderColor: '#27272a', borderRadius: '8px' }} />
