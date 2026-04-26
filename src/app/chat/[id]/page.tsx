@@ -216,6 +216,40 @@ export default function ChatAnalyticsPage() {
               </CardContent>
             </Card>
           </div>
+          {/* Quick Trivia Cards */}
+          <div className="grid grid-cols-2 gap-4">
+            <Card className="bg-secondary/40 backdrop-blur-xl border-border/50 shadow-2xl relative overflow-hidden group">
+              <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
+                <Sparkles className="h-12 w-12 text-emerald-400" />
+              </div>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-xs font-bold uppercase tracking-widest text-emerald-400/80">The Chat Dominator</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-white">
+                  {analytics && analytics.msgsSender1 > analytics.msgsSender2 ? analytics.sender1 : analytics?.sender2}
+                </div>
+                <p className="text-[11px] text-muted-foreground mt-1">Sent more total messages.</p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-secondary/40 backdrop-blur-xl border-border/50 shadow-2xl relative overflow-hidden group">
+              <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
+                <MessageSquareText className="h-12 w-12 text-blue-400" />
+              </div>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-xs font-bold uppercase tracking-widest text-blue-400/80">The Storyteller</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-white">
+                  {analytics && (parsedChat.filter(m => m.sender === analytics.sender1).reduce((acc, m) => acc + m.message.length, 0) / (analytics.msgsSender1 || 1) > 
+                   parsedChat.filter(m => m.sender === analytics.sender2).reduce((acc, m) => acc + m.message.length, 0) / (analytics.msgsSender2 || 1)) 
+                   ? analytics.sender1 : analytics?.sender2}
+                </div>
+                <p className="text-[11px] text-muted-foreground mt-1">Writes longer, more detailed texts.</p>
+              </CardContent>
+            </Card>
+          </div>
         </div>
 
         {/* Right Side: Floating AI Chat */}
@@ -228,7 +262,7 @@ export default function ChatAnalyticsPage() {
             </div>
             <div>
               <h3 className="font-semibold text-white text-lg">ThreadLens AI</h3>
-              <p className="text-xs text-muted-foreground">Powered by Grok (128k Context)</p>
+              <p className="text-xs text-muted-foreground">Powered by Grok 2</p>
             </div>
           </div>
           
@@ -262,7 +296,26 @@ export default function ChatAnalyticsPage() {
             )}
           </div>
           
-          <div className="p-4 border-t border-white/5 bg-secondary/40 relative z-10">
+          <div className="p-4 border-t border-white/5 bg-secondary/40 relative z-10 space-y-4">
+            {/* Suggested Prompts */}
+            <div className="flex flex-wrap gap-2">
+              {[
+                "Who says sorry more?",
+                "What's our common vibe?",
+                "Analyze relationship dynamics"
+              ].map((p) => (
+                <button
+                  key={p}
+                  onClick={() => {
+                    setQuery(p);
+                  }}
+                  className="text-[11px] px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-muted-foreground hover:text-emerald-400 hover:border-emerald-400/50 hover:bg-emerald-400/5 transition-all"
+                >
+                  {p}
+                </button>
+              ))}
+            </div>
+
             <form
               onSubmit={(e) => {
                 e.preventDefault();
@@ -273,7 +326,7 @@ export default function ChatAnalyticsPage() {
               <Input
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Ask about relationship dynamics, patterns..."
+                placeholder="Ask about relationship dynamics..."
                 className="flex-1 bg-background/50 border-white/10 text-white placeholder:text-muted-foreground focus-visible:ring-emerald-500/50 rounded-xl h-12 px-4"
               />
               <Button type="submit" size="icon" className="bg-emerald-500 hover:bg-emerald-600 rounded-xl h-12 w-12 shadow-lg shadow-emerald-500/20 transition-all hover:scale-105 active:scale-95" disabled={isTyping}>
