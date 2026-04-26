@@ -1,14 +1,13 @@
 import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
 
-// We initialize OpenAI client with the Grok Base URL and the user's xAI key
-const openai = new OpenAI({
-  apiKey: process.env.XAI_API_KEY,
-  baseURL: 'https://api.x.ai/v1',
-});
-
 export async function POST(req: Request) {
   try {
+    const openai = new OpenAI({
+      apiKey: process.env.XAI_API_KEY || '',
+      baseURL: 'https://api.x.ai/v1',
+    });
+
     const { query, messages, chatContext } = await req.json();
 
     if (!query) {

@@ -56,6 +56,7 @@ export default function ChatAnalyticsPage() {
         maxMsgs = count;
         peakHour = parseInt(h);
       }
+    }
     const peakHour12 = peakHour % 12 === 0 ? 12 : peakHour % 12;
     const peakAmPm = peakHour >= 12 ? "PM" : "AM";
     const activityByHour = Array.from({ length: 24 }).map((_, i) => {
