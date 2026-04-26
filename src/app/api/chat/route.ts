@@ -24,7 +24,7 @@ Here is the conversation context:
 ${chatContext}`;
 
     const completion = await openai.chat.completions.create({
-      model: 'grok-2-1212', 
+      model: 'grok-beta', 
       messages: [
         { role: 'system', content: systemPrompt },
         ...messages.map((m: any) => ({ role: m.role, content: m.content })),
