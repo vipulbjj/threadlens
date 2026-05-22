@@ -1,95 +1,116 @@
 import Link from "next/link";
-import { ArrowRight, MessageSquare, Shield, Zap, Sparkles, BarChart3, Lock } from "lucide-react";
+import { ArrowRight, Shield, Sparkles, MessageCircle } from "lucide-react";
+import { HomeSessionsLink } from "@/components/HomeSessionsLink";
 
-export default function LandingPage() {
+export default function Home() {
   return (
-    <div className="flex flex-col items-center justify-center w-full">
-      {/* Hero Section */}
-      <section className="w-full min-h-[90vh] flex flex-col items-center justify-center relative overflow-hidden px-6 text-center">
-        {/* Glow Effects */}
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-emerald-500/20 blur-[120px] rounded-full pointer-events-none -z-10" />
-        <div className="absolute bottom-0 right-0 w-[500px] h-[300px] bg-blue-500/10 blur-[100px] rounded-full pointer-events-none -z-10" />
-        
-        <div className="mb-6 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-sm text-emerald-300 font-medium animate-in fade-in slide-in-from-bottom-4 duration-700">
-          <Sparkles className="h-4 w-4" />
-          <span>Now supporting WhatsApp, Telegram & iMessage</span>
-        </div>
+    <div className="min-h-screen bg-zinc-950 text-zinc-50 overflow-x-hidden">
+      <div className="pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,rgba(16,185,129,0.15),transparent_50%),radial-gradient(ellipse_60%_40%_at_80%_0%,rgba(59,130,246,0.08),transparent_50%)]" />
 
-        <h1 className="text-5xl md:text-7xl lg:text-8xl font-extrabold tracking-tight max-w-5xl mx-auto leading-tight animate-in fade-in slide-in-from-bottom-6 duration-1000">
-          Unlock the secrets of your <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-400 to-blue-500">conversations.</span>
-        </h1>
-        
-        <p className="mt-8 text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto font-medium animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-150">
-          Upload any chat export. Ask AI questions. Discover hidden patterns, emotional trends, and relationship dynamics in seconds.
-        </p>
-
-        <div className="mt-12 flex flex-col sm:flex-row gap-4 animate-in fade-in slide-in-from-bottom-10 duration-1000 delay-300">
-          <Link href="/upload">
-            <button className="h-14 px-8 text-lg font-semibold bg-emerald-500 text-white rounded-full hover:bg-emerald-600 hover:scale-105 transition-all shadow-lg shadow-emerald-500/20 flex items-center gap-2">
-              Start Analyzing <ArrowRight className="h-5 w-5" />
-            </button>
+      <header className="relative z-10 mx-auto flex w-full max-w-5xl items-center justify-between px-6 py-6">
+        <span className="text-lg font-bold tracking-tight text-white">ThreadLens</span>
+        <nav className="flex items-center gap-6 text-sm font-medium text-zinc-400">
+          <Link href="#how" className="hover:text-white transition-colors">
+            How it works
           </Link>
-          <Link href="/dashboard">
-            <button className="h-14 px-8 text-lg font-semibold bg-white/5 text-white border border-white/10 rounded-full hover:bg-white/10 transition-all flex items-center gap-2">
-              View Dashboard
-            </button>
+          <Link
+            href="/upload"
+            className="inline-flex items-center gap-2 rounded-full bg-emerald-500 px-4 py-2 text-sm font-semibold text-zinc-950 hover:bg-emerald-400 transition-colors"
+          >
+            Get started
+            <ArrowRight className="h-4 w-4" />
           </Link>
-        </div>
-      </section>
+        </nav>
+      </header>
 
-      {/* Features Section */}
-      <section id="features" className="w-full py-24 bg-secondary/20 border-t border-white/5 relative">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-5xl font-bold bg-gradient-to-b from-white to-white/60 bg-clip-text text-transparent">
-              Why ThreadLens?
-            </h2>
-            <p className="mt-4 text-lg text-muted-foreground">The most advanced, privacy-first relationship analytics engine.</p>
+      <main className="relative z-10 mx-auto max-w-5xl px-6 pb-24">
+        <section className="pt-8 pb-16 text-center lg:pt-16">
+          <p className="mb-4 inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-xs font-medium text-emerald-300">
+            <Sparkles className="h-3 w-3" />
+            Built for group chats and late-night threads
+          </p>
+          <h1 className="font-display text-4xl font-bold tracking-tight text-white sm:text-6xl lg:text-7xl">
+            See what your chats are{" "}
+            <span className="bg-gradient-to-r from-emerald-300 via-teal-200 to-sky-300 bg-clip-text text-transparent">
+              really saying
+            </span>
+          </h1>
+          <p className="mx-auto mt-6 max-w-xl text-lg text-zinc-400">
+            Drop a WhatsApp, Telegram, or iMessage export. Parsing stays on your phone. AI chat only sends what you ask about.
+          </p>
+          <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
+            <Link
+              href="/upload"
+              className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-emerald-500 px-8 py-4 text-base font-semibold text-zinc-950 shadow-lg shadow-emerald-500/20 hover:bg-emerald-400 sm:w-auto"
+            >
+              Upload a chat export
+              <ArrowRight className="h-5 w-5" />
+            </Link>
+            <Link
+              href="/dashboard"
+              className="inline-flex w-full items-center justify-center rounded-2xl border border-zinc-600 bg-zinc-900/80 px-8 py-4 text-base font-medium text-zinc-100 hover:bg-zinc-800 sm:w-auto"
+            >
+              Open saved threads
+            </Link>
           </div>
+        </section>
 
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="bg-secondary/40 backdrop-blur-xl border border-white/5 p-8 rounded-3xl hover:bg-secondary/60 transition-colors">
-              <div className="w-14 h-14 bg-emerald-500/10 rounded-2xl flex items-center justify-center mb-6">
-                <BarChart3 className="h-7 w-7 text-emerald-400" />
+        <section id="how" className="border-t border-zinc-800/80 py-20">
+          <h2 className="text-center text-3xl font-bold text-white">How it works</h2>
+          <ol className="mx-auto mt-12 max-w-2xl space-y-10 border-l-2 border-emerald-500/40 pl-8">
+            {[
+              {
+                step: "01",
+                title: "Export your chat",
+                body: "WhatsApp: Chat → Export chat → Without media → .txt. On upload, pick the platform that matches your file.",
+              },
+              {
+                step: "02",
+                title: "Stats stay on your device",
+                body: "Parsing runs in your browser. We count messages, reply times, and patterns—nothing is uploaded for analytics unless you use AI chat.",
+              },
+              {
+                step: "03",
+                title: "Ask questions (optional)",
+                body: "Turn on Grok in settings if you want. Only the messages needed for your question are sent to xAI—not your whole export.",
+              },
+            ].map((item) => (
+              <li key={item.step} className="relative">
+                <span className="absolute -left-[2.35rem] top-0 text-xs font-bold tabular-nums text-emerald-400">
+                  {item.step}
+                </span>
+                <h3 className="text-lg font-semibold text-white">{item.title}</h3>
+                <p className="mt-2 text-sm text-zinc-400 leading-relaxed">{item.body}</p>
+              </li>
+            ))}
+          </ol>
+        </section>
+
+        <section className="py-16">
+          <div className="rounded-3xl border border-zinc-800 bg-zinc-900/40 p-8 md:p-10 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+            <div className="flex items-start gap-4">
+              <Shield className="mt-1 h-6 w-6 shrink-0 text-emerald-400" aria-hidden />
+              <div>
+                <h3 className="text-lg font-semibold text-white">Privacy, honestly</h3>
+                <p className="mt-2 text-sm text-zinc-400 max-w-xl">
+                  Parsing is local. AI chat sends message text to xAI when you ask—we do not claim zero-knowledge storage or that your data never hits a database. Read the code and the API route before you trust marketing copy.
+                </p>
               </div>
-              <h3 className="text-2xl font-bold text-white mb-3">Deep Intelligence</h3>
-              <p className="text-muted-foreground leading-relaxed">
-                Who says sorry more? What's the emotional trend? Our universal parser instantly extracts metadata to build precise analytical charts.
-              </p>
             </div>
-
-            <div className="bg-secondary/40 backdrop-blur-xl border border-white/5 p-8 rounded-3xl hover:bg-secondary/60 transition-colors">
-              <div className="w-14 h-14 bg-blue-500/10 rounded-2xl flex items-center justify-center mb-6">
-                <MessageSquare className="h-7 w-7 text-blue-400" />
-              </div>
-              <h3 className="text-2xl font-bold text-white mb-3">Ask the Chat Anything</h3>
-              <p className="text-muted-foreground leading-relaxed">
-                Powered by xAI's Grok. Have a natural conversation with your chat history. Uncover relationship dynamics you never knew existed.
-              </p>
-            </div>
-
-            <div className="bg-secondary/40 backdrop-blur-xl border border-white/5 p-8 rounded-3xl hover:bg-secondary/60 transition-colors relative overflow-hidden">
-              <div className="absolute -right-10 -top-10 w-40 h-40 bg-emerald-500/10 blur-3xl rounded-full" />
-              <div className="w-14 h-14 bg-rose-500/10 rounded-2xl flex items-center justify-center mb-6">
-                <Lock className="h-7 w-7 text-rose-400" />
-              </div>
-              <h3 className="text-2xl font-bold text-white mb-3">Zero-Knowledge Privacy</h3>
-              <p className="text-muted-foreground leading-relaxed">
-                Your data never hits a database. Parsing happens 100% locally in your browser. We pass your prompt statelessly to the AI.
-              </p>
+            <div className="flex flex-wrap gap-6 text-sm text-zinc-500">
+              <span className="flex items-center gap-2">
+                <MessageCircle className="h-4 w-4" /> Local parsing
+              </span>
+              <span className="flex items-center gap-2">
+                <Sparkles className="h-4 w-4" /> Optional AI (xAI)
+              </span>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      </main>
 
-      {/* Footer */}
-      <footer className="w-full py-12 px-6 border-t border-white/5 bg-background text-center flex flex-col items-center">
-        <div className="flex items-center gap-2 mb-4">
-          <Zap className="h-5 w-5 text-emerald-500" />
-          <span className="text-xl font-bold tracking-tight text-white">ThreadLens</span>
-        </div>
-        <p className="text-muted-foreground text-sm">© 2026 ThreadLens Inc. All rights reserved.</p>
-        <p className="text-muted-foreground text-sm mt-2">Built with Next.js, Zustand, and xAI Grok.</p>
+      <footer className="relative z-10 border-t border-zinc-800 py-8 text-center text-sm text-zinc-500">
+        ThreadLens · For personal reflection, not therapy or legal advice
       </footer>
     </div>
   );

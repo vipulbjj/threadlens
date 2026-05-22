@@ -1,36 +1,40 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ThreadLens
 
-## Getting Started
+Understand what your group chats are really saying — without sending your whole camera roll to the cloud.
 
-First, run the development server:
+## What it does
+
+1. **Export** a chat from WhatsApp, Telegram, or iMessage (`.txt` or `.json`).
+2. **Parse locally** in your browser — the file is not uploaded to our servers for parsing.
+3. **See stats** on the dashboard: who texts most, message counts, apology-style replies.
+4. **Ask questions** with optional AI (xAI Grok). Only the messages needed to answer your question are sent to the API.
+
+## Privacy (read this)
+
+- Chat **parsing** happens entirely in your browser.
+- **Saved threads** live in your browser’s `localStorage` on this device only.
+- **AI chat** sends message text from the thread you are asking about to [xAI](https://x.ai/) when you click send. We do not run a “zero-knowledge” backend that never sees your messages unless you use AI features.
+
+## Setup
 
 ```bash
+npm install
+cp .env.example .env   # add XAI_API_KEY from https://console.x.ai/
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Scripts
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- `npm run dev` — development server
+- `npm run build` — production build
+- `npm run test` — parser unit tests (Vitest)
 
-## Learn More
+## Deploy
 
-To learn more about Next.js, take a look at the following resources:
+Configured for [Vercel](https://vercel.app). Set `XAI_API_KEY` in the Vercel project environment.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Tech
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Next.js 16 · React 19 · Zustand · Tailwind CSS 4 · Recharts · OpenAI SDK (xAI API)

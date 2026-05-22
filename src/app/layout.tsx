@@ -1,21 +1,23 @@
-import Link from "next/link";
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import Link from "next/link";
+import { DM_Sans, Outfit } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const dmSans = DM_Sans({
   subsets: ["latin"],
+  variable: "--font-dm-sans",
+  display: "swap",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const outfit = Outfit({
   subsets: ["latin"],
+  variable: "--font-outfit",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "ThreadLens - Universal Chat Analytics",
-  description: "AI-powered insights for WhatsApp, Telegram, and iMessage exports.",
+  title: "ThreadLens — Understand your group chats",
+  description: "Upload WhatsApp, Telegram, or iMessage exports. Parse locally. Ask AI about patterns, tone, and red flags.",
 };
 
 export default function RootLayout({
@@ -24,33 +26,22 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased dark`}
-    >
-      <body className="min-h-full flex flex-col bg-background text-foreground">
-        <header className="px-6 h-16 flex items-center border-b border-white/5 backdrop-blur-md sticky top-0 z-50 bg-background/80">
-          <Link className="flex items-center justify-center transition-transform hover:scale-105" href="/">
-            <div className="bg-emerald-500/20 p-1.5 rounded-lg mr-2">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-emerald-400"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
-            </div>
-            <span className="text-xl font-bold tracking-tight text-white">ThreadLens<span className="text-emerald-400">.</span></span>
-          </Link>
-          <nav className="ml-auto flex items-center gap-6">
-            <Link className="text-sm font-medium text-muted-foreground hover:text-white transition-colors" href="/upload">
-              Upload
+    <html lang="en" className="dark">
+      <body className={`${dmSans.variable} ${outfit.variable} font-sans antialiased`}>
+        {children}
+        <nav className="fixed bottom-0 left-0 right-0 z-50 flex justify-around border-t border-zinc-800 bg-zinc-950/95 backdrop-blur-md pb-[max(0.5rem,env(safe-area-inset-bottom))] md:hidden pointer-events-none">
+          <div className="pointer-events-auto flex w-full max-w-lg justify-around px-2 py-2">
+            <Link href="/" className="flex flex-col items-center gap-0.5 rounded-lg px-3 py-2 text-xs text-zinc-400 hover:text-zinc-100">
+              Home
             </Link>
-            <Link className="text-sm font-medium text-muted-foreground hover:text-white transition-colors" href="/dashboard">
-              Dashboard
+            <Link href="/upload" className="flex flex-col items-center gap-0.5 rounded-lg px-3 py-2 text-xs text-zinc-400 hover:text-zinc-100">
+              Import
             </Link>
-            <Link className="text-sm font-medium bg-white text-black px-4 py-2 rounded-full hover:bg-emerald-400 hover:text-black transition-all shadow-md" href="/upload">
-              Start Free
+            <Link href="/dashboard" className="flex flex-col items-center gap-0.5 rounded-lg px-3 py-2 text-xs text-zinc-400 hover:text-zinc-100">
+              Threads
             </Link>
-          </nav>
-        </header>
-        <main className="flex-1 flex flex-col relative">
-          {children}
-        </main>
+          </div>
+        </nav>
       </body>
     </html>
   );

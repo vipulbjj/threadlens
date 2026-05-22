@@ -1,122 +1,115 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Clock, MessageSquareText, TrendingUp, Users } from "lucide-react";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { useChatStore } from "@/lib/store";
+import { useRouter } from "next/navigation";
+import { MessageSquare, Upload, Trash2, BarChart3 } from "lucide-react";
+import { useChatStore, useActiveSession } from "@/lib/store";
+import { getChatStats } from "@/lib/parser";
 
-export default function Dashboard() {
-  const { messages, activeChatName } = useChatStore();
-  
-  const totalMessages = messages.length;
-  
-  // Calculate basic stats
-  const senders = Array.from(new Set(messages.map(m => m.sender)));
-  
-  let fastSender = "N/A";
-  if (totalMessages > 0 && senders.length >= 2) {
-    // Just a dummy logic for display since accurate response time is complex without DB
-    fastSender = senders[0];
-  }
+export default function DashboardPage() {
+  const router = useRouter();
+  const sessions = useChatStore((s) => s.sessions);
+  const removeSession = useChatStore((s) => s.removeSession);
+  const active = useActiveSession();
+
+  const stats = active ? getChatStats(active.messages) : null;
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-6 md:p-12">
-      <div className="w-full max-w-6xl flex items-center justify-between mb-8">
+    <div className="min-h-screen bg-zinc-950 text-zinc-100 p-6 pb-24">
+      <header className="max-w-4xl mx-auto flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
         <div>
-          <h2 className="text-4xl font-bold tracking-tight bg-gradient-to-br from-white to-white/60 bg-clip-text text-transparent">Overview</h2>
-          <p className="text-muted-foreground mt-1">Your recent chat analysis sessions.</p>
+          <h1 className="text-2xl font-bold tracking-tight">Your threads</h1>
+          <p className="text-zinc-400 text-sm mt-1">
+            {sessions.length === 0
+              ? "Import a chat to see patterns and ask questions."
+              : `${sessions.length} saved on this device`}
+          </p>
         </div>
-        <Link href="/upload">
-          <Button className="bg-emerald-500 hover:bg-emerald-600 shadow-lg shadow-emerald-500/20 text-white rounded-xl px-6">
-            + Upload Chat
-          </Button>
+        <Link
+          href="/upload"
+          className="inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-500 px-4 py-2.5 text-sm font-semibold text-zinc-950 hover:bg-emerald-400 transition-colors"
+        >
+          <Upload className="h-4 w-4" />
+          Import chat
         </Link>
-      </div>
+      </header>
 
-      <div className="w-full max-w-6xl grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-8">
-        <Card className="bg-secondary/40 backdrop-blur-xl border-border/50 shadow-xl">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Total Messages Parsed</CardTitle>
-            <MessageSquareText className="h-4 w-4 text-emerald-400" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-white">{totalMessages > 0 ? totalMessages.toLocaleString() : "0"}</div>
-            <p className="text-xs text-muted-foreground mt-1">In current session</p>
-          </CardContent>
-        </Card>
-        <Card className="bg-secondary/40 backdrop-blur-xl border-border/50 shadow-xl">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Fastest Responder</CardTitle>
-            <Clock className="h-4 w-4 text-blue-400" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-white">{totalMessages > 0 ? fastSender : "None"}</div>
-            <p className="text-xs text-muted-foreground mt-1">Based on local parsing</p>
-          </CardContent>
-        </Card>
-        <Card className="bg-secondary/40 backdrop-blur-xl border-border/50 shadow-xl">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Avg Message Length</CardTitle>
-            <TrendingUp className="h-4 w-4 text-indigo-400" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-white">
-              {totalMessages > 0 ? Math.round(messages.reduce((acc, m) => acc + m.message.length, 0) / totalMessages) : 0}
-            </div>
-            <p className="text-xs text-muted-foreground mt-1">Characters per message</p>
-          </CardContent>
-        </Card>
-        <Card className="bg-secondary/40 backdrop-blur-xl border-border/50 shadow-xl">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Participants</CardTitle>
-            <Users className="h-4 w-4 text-rose-400" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-white">{senders.length} Active</div>
-            <p className="text-xs text-muted-foreground mt-1">In current chat</p>
-          </CardContent>
-        </Card>
-      </div>
-
-      <div className="w-full max-w-6xl">
-        <Card className="bg-secondary/20 backdrop-blur-2xl border-white/5 shadow-2xl">
-          <CardHeader className="border-b border-white/5 bg-secondary/40">
-            <CardTitle className="text-lg">Recent Sessions</CardTitle>
-          </CardHeader>
-          <CardContent className="p-6">
-            {activeChatName ? (
-              <Link 
-                href={`/chat/${encodeURIComponent(activeChatName)}`} 
-                className="flex items-center bg-secondary/50 hover:bg-secondary border border-white/5 p-4 rounded-xl transition-all hover:scale-[1.01] hover:shadow-lg"
+      {sessions.length === 0 ? (
+        <div className="max-w-md mx-auto text-center py-16 space-y-4 rounded-2xl border border-zinc-800 bg-zinc-900/40 p-8">
+          <MessageSquare className="h-12 w-12 text-emerald-400 mx-auto" />
+          <h2 className="text-lg font-semibold">No chats yet</h2>
+          <p className="text-zinc-400 text-sm">Export a thread, drop the file, and we will chart who texts more and flag the vibes.</p>
+          <Link href="/upload" className="inline-block text-emerald-400 font-medium hover:underline">
+            Go to upload
+          </Link>
+        </div>
+      ) : (
+        <div className="max-w-4xl mx-auto grid gap-4 sm:grid-cols-2">
+          {sessions.map((session) => {
+            const sessionStats = getChatStats(session.messages);
+            const topSender = sessionStats.bySender.sort((a, b) => b.count - a.count)[0];
+            return (
+              <article
+                key={session.id}
+                className="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-5 hover:border-zinc-600 transition-colors flex flex-col"
               >
-                <div className="p-3 bg-emerald-500/10 rounded-lg mr-4">
-                  <MessageSquareText className="h-6 w-6 text-emerald-400" />
+                <div className="flex items-start justify-between gap-2">
+                  <div>
+                    <h2 className="font-semibold truncate">{session.name}</h2>
+                    <p className="text-xs text-zinc-500 capitalize">{session.platform}</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => removeSession(session.id)}
+                    className="text-zinc-500 hover:text-red-400 p-1"
+                    aria-label="Remove session"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
                 </div>
-                <div className="space-y-1">
-                  <p className="text-lg font-semibold text-white leading-none">{activeChatName}</p>
-                  <p className="text-sm text-muted-foreground">Stored securely in local memory</p>
-                </div>
-                <div className="ml-auto flex items-center">
-                  <span className="font-mono text-emerald-400 bg-emerald-400/10 px-3 py-1 rounded-md text-sm">
-                    {totalMessages.toLocaleString()} msgs
-                  </span>
-                </div>
-              </Link>
-            ) : (
-              <div className="text-center py-12 border-2 border-dashed border-white/10 rounded-xl">
-                <MessageSquareText className="h-12 w-12 text-muted-foreground mx-auto mb-4 opacity-50" />
-                <p className="text-lg font-medium text-muted-foreground">No chats analyzed yet.</p>
-                <Link href="/upload">
-                  <Button variant="link" className="text-emerald-400 hover:text-emerald-300 mt-2">
-                    Upload your first chat export &rarr;
-                  </Button>
-                </Link>
+                <dl className="mt-4 grid grid-cols-2 gap-3 text-sm">
+                  <div>
+                    <dt className="text-zinc-500">Messages</dt>
+                    <dd className="font-medium">{sessionStats.totalMessages}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-zinc-500">Most active</dt>
+                    <dd className="font-medium truncate">{topSender?.sender ?? "—"}</dd>
+                  </div>
+                </dl>
+                <button
+                  type="button"
+                  onClick={() => router.push(`/chat/${encodeURIComponent(session.id)}`)}
+                  className="mt-4 w-full rounded-lg bg-zinc-800 py-2 text-sm font-medium hover:bg-zinc-700 transition-colors"
+                >
+                  Open analysis
+                </button>
+              </article>
+            );
+          })}
+        </div>
+      )}
+
+      {active && stats && (
+        <section className="max-w-4xl mx-auto mt-10 rounded-2xl border border-zinc-800 bg-zinc-900/40 p-6">
+          <h2 className="text-lg font-semibold flex items-center gap-2 mb-4">
+            <BarChart3 className="h-5 w-5 text-emerald-400" />
+            Snapshot: {active.name}
+          </h2>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {stats.bySender.slice(0, 6).map((row) => (
+              <div key={row.sender} className="rounded-xl bg-zinc-950/80 p-4 border border-zinc-800">
+                <p className="font-medium truncate">{row.sender}</p>
+                <p className="text-2xl font-bold text-emerald-400">{row.count}</p>
+                <p className="text-xs text-zinc-500">messages · avg {row.avgLength} chars</p>
+                {row.sorryCount > 0 && (
+                  <p className="text-xs text-amber-400/90 mt-1">{row.sorryCount} sorry-style replies</p>
+                )}
               </div>
-            )}
-          </CardContent>
-        </Card>
-      </div>
+            ))}
+          </div>
+        </section>
+      )}
     </div>
   );
 }

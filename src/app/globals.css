@@ -1,5 +1,10 @@
 @import "tailwindcss";
 
+@theme {
+  --font-sans: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-outfit), var(--font-dm-sans), ui-sans-serif, sans-serif;
+}
+
 @plugin "tailwindcss-animate";
 
 @theme {
@@ -40,6 +45,15 @@
 @layer base {
   * {
     @apply border-border;
+  }
+  a:focus-visible,
+  button:focus-visible,
+  [role="button"]:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible {
+    outline: 2px solid hsl(142 71% 45%);
+    outline-offset: 2px;
   }
   body {
     @apply bg-background text-foreground antialiased selection:bg-emerald-500/30;

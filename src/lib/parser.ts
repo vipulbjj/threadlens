@@ -1,60 +1,186 @@
-export function parseUniversalChat(text: string) {
-  const messages = [];
-  
-  // 1. Try WhatsApp Format (Android & iOS)
-  // Android: "12/05/24, 10:14 PM - Vipul: Hello"
-  // iOS: "[14/2/26, 10:00:40 PM] Vipul Bajaj: Hello"
-  const waRegex = /(?:\[(\d{1,2}\/\d{1,2}\/\d{2,4}),\s(\d{1,2}:\d{2}(?::\d{2})?(?:\s?[A-Z]{2})?)\]|(\d{1,2}\/\d{1,2}\/\d{2,4}),\s(\d{1,2}:\d{2}(?:\s?[A-Z]{2})?)\s-)\s([^:]+):\s([\s\S]*?)(?=(?:\[\d{1,2}\/\d{1,2}\/\d{2,4},\s\d{1,2}:\d{2}(?::\d{2})?(?:\s?[A-Z]{2})?\]|\d{1,2}\/\d{1,2}\/\d{2,4},\s\d{1,2}:\d{2}(?:\s?[A-Z]{2})?\s-)|$)/g;
-  
-  let match;
-  while ((match = waRegex.exec(text)) !== null) {
-    const date = match[1] || match[3];
-    const time = match[2] || match[4];
-    const sender = match[5].trim();
-    const message = match[6].trim();
-    
-    if (!message.includes("Messages and calls are end-to-end encrypted")) {
-      messages.push({ date, time, sender, message });
-    }
+import type { ChatPlatform } from "./store";
+
+export interface ParsedMessage {
+  date: string;
+  time: string;
+  sender: string;
+  message: string;
+}
+
+export class ParseError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "ParseError";
+  }
+}
+
+const SKIP_SNIPPETS = [
+  "Messages and calls are end-to-end encrypted",
+  "<Media omitted>",
+  "image omitted",
+  "video omitted",
+  "audio omitted",
+  "sticker omitted",
+];
+
+function shouldSkipMessage(message: string) {
+  const trimmed = message.trim();
+  if (!trimmed) return true;
+  return SKIP_SNIPPETS.some((s) => trimmed.includes(s));
+}
+
+function pushMessage(messages: ParsedMessage[], row: ParsedMessage) {
+  if (shouldSkipMessage(row.message)) return;
+  messages.push(row);
+}
+
+export function parseUniversalChat(text: string, platform: ChatPlatform = "whatsapp"): ParsedMessage[] {
+  const trimmed = text.trim();
+  if (!trimmed) {
+    throw new ParseError("The file looks empty. Export your chat again and re-upload.");
   }
 
-  // If WhatsApp parser found messages, return them.
-  if (messages.length > 0) return messages;
+  const messages: ParsedMessage[] = [];
 
-  // 2. Try JSON Parse (Telegram / Instagram)
+  if (platform === "telegram") {
+    const telegram = parseTelegram(trimmed);
+    if (telegram.length > 0) return telegram;
+  }
+
+  if (platform === "whatsapp" || platform === "imessage") {
+    const wa = parseWhatsApp(trimmed);
+    if (wa.length > 0) return wa;
+  }
+
+  const generic = parseGeneric(trimmed);
+  if (generic.length > 0) return generic;
+
+  if (platform === "telegram") {
+    throw new ParseError(
+      "Could not read this Telegram export. Try JSON from Telegram Desktop, or a .txt export with lines like: [date time] Name: message"
+    );
+  }
+  if (platform === "imessage") {
+    throw new ParseError(
+      "Could not read this iMessage export. Export the thread as .txt (one line per message with sender names), then try again."
+    );
+  }
+  throw new ParseError(
+    "Could not find messages in this file. For WhatsApp: Export chat → Without media → .txt. Then drop that file here."
+  );
+}
+
+function parseWhatsApp(text: string) {
+  const messages: ParsedMessage[] = [];
+  const bracketed =
+    /\[(\d{1,2}\/\d{1,2}\/\d{2,4}),\s(\d{1,2}:\d{2}(?::\d{2})?(?:\s?[AP]M)?)\]\s([^:]+):\s([\s\S]*?)(?=\[\d{1,2}\/\d{1,2}\/\d{2,4},|\d{1,2}\/\d{1,2}\/\d{2,4},|$)/gi;
+  const plain =
+    /(\d{1,2}\/\d{1,2}\/\d{2,4}),\s(\d{1,2}:\d{2}(?:\s?[AP]M)?)\s-([^:]+):\s([\s\S]*?)(?=\d{1,2}\/\d{1,2}\/\d{2,4},|\d{1,2}:\d{2}|$)/gi;
+
+  for (const re of [bracketed, plain]) {
+    re.lastIndex = 0;
+    let match: RegExpExecArray | null;
+    while ((match = re.exec(text)) !== null) {
+      pushMessage(messages, {
+        date: match[1],
+        time: match[2],
+        sender: match[3].trim(),
+        message: match[4].trim(),
+      });
+    }
+  }
+  return messages;
+}
+
+function parseTelegram(text: string) {
+  const messages: ParsedMessage[] = [];
+
   try {
     const jsonParsed = JSON.parse(text);
-    if (jsonParsed.messages) {
-      // Telegram format
+    if (jsonParsed.messages && Array.isArray(jsonParsed.messages)) {
       for (const m of jsonParsed.messages) {
         if (m.type === "message" && typeof m.text === "string" && m.text.trim()) {
           const dateObj = new Date(m.date);
-          messages.push({
+          pushMessage(messages, {
             date: dateObj.toLocaleDateString(),
             time: dateObj.toLocaleTimeString(),
             sender: m.from || "Unknown",
-            message: m.text
+            message: m.text,
           });
         }
       }
       if (messages.length > 0) return messages;
     }
-  } catch (e) {
-    // Not JSON, continue to generic regex
+  } catch {
+    // fall through to txt patterns
   }
 
-  // 3. Try Telegram TXT Format (Example: "14.02.26 22:00:40 Sender: Message")
-  // Or generic "[Date Time] Sender: Message"
-  const genericRegex = /\[?(?:\d{2,4}[-./]\d{1,2}[-./]\d{1,2})\s+(?:\d{1,2}:\d{2}(?::\d{2})?(?:\s?[A-Z]{2})?)\]?\s+([^:]+):\s+([\s\S]*?)(?=\[?(?:\d{2,4}[-./]\d{1,2}[-./]\d{1,2})\s+(?:\d{1,2}:\d{2})|$)/g;
-  
-  while ((match = genericRegex.exec(text)) !== null) {
-    messages.push({ 
-      date: "Unknown Date", 
-      time: "Unknown Time", 
-      sender: match[1].trim(), 
-      message: match[2].trim() 
+  const tgTxt =
+    /\[?(\d{1,2}[./]\d{1,2}[./]\d{2,4})[\s,]+(\d{1,2}:\d{2}(?::\d{2})?(?:\s?[AP]M)?)\]?\s+([^:]+):\s+([\s\S]*?)(?=\[|\d{1,2}[./]\d{1,2}[./]\d{2,4}[\s,]+\d{1,2}:\d{2}|$)/gi;
+
+  let match: RegExpExecArray | null;
+  while ((match = tgTxt.exec(text)) !== null) {
+    pushMessage(messages, {
+      date: match[1],
+      time: match[2],
+      sender: match[3].trim(),
+      message: match[4].trim(),
     });
   }
 
   return messages;
+}
+
+function parseGeneric(text: string) {
+  const messages: ParsedMessage[] = [];
+  const genericRegex =
+    /\[?(?:\d{2,4}[-./]\d{1,2}[-./]\d{1,2})\s+(?:\d{1,2}:\d{2}(?::\d{2})?(?:\s?[AP]M)?)\]?\s+([^:]+):\s+([\s\S]*?)(?=\[?(?:\d{2,4}[-./]\d{1,2}[-./]\d{1,2})\s+(?:\d{1,2}:\d{2})|$)/gi;
+
+  let match: RegExpExecArray | null;
+  while ((match = genericRegex.exec(text)) !== null) {
+    pushMessage(messages, {
+      date: "Unknown date",
+      time: "Unknown time",
+      sender: match[1].trim(),
+      message: match[2].trim(),
+    });
+  }
+  return messages;
+}
+
+/** Keep imports bounded for browser memory and localStorage. */
+export const MAX_IMPORT_MESSAGES = 12_000;
+
+export function capImportedMessages(messages: ParsedMessage[]) {
+  if (messages.length <= MAX_IMPORT_MESSAGES) {
+    return { messages, truncated: false, originalCount: messages.length };
+  }
+  return {
+    messages: messages.slice(-MAX_IMPORT_MESSAGES),
+    truncated: true,
+    originalCount: messages.length,
+  };
+}
+
+export function getChatStats(messages: ParsedMessage[]) {
+  const senders = Array.from(new Set(messages.map((m) => m.sender)));
+  const totalChars = messages.reduce((acc, m) => acc + m.message.length, 0);
+  const bySender = senders.map((sender) => {
+    const senderMsgs = messages.filter((m) => m.sender === sender);
+    const sorryCount = senderMsgs.filter((m) => /\b(sorry|apologize|apologies|my bad)\b/i.test(m.message)).length;
+    return {
+      sender,
+      count: senderMsgs.length,
+      avgLength: senderMsgs.length ? Math.round(totalChars / messages.length) : 0,
+      sorryCount,
+      totalChars: senderMsgs.reduce((acc, m) => acc + m.message.length, 0),
+    };
+  });
+
+  return {
+    senders,
+    totalMessages: messages.length,
+    avgMessageLength: messages.length ? Math.round(totalChars / messages.length) : 0,
+    bySender,
+  };
 }

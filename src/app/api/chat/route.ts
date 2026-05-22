@@ -1,55 +1,61 @@
-import { NextResponse } from 'next/server';
-import OpenAI from 'openai';
+import { NextResponse } from "next/server";
+import OpenAI from "openai";
+
+const MAX_MESSAGES = 400;
+const MAX_QUESTION_CHARS = 2000;
 
 export async function POST(req: Request) {
   try {
-    const openai = new OpenAI({
-      apiKey: process.env.XAI_API_KEY || '',
-      baseURL: 'https://api.x.ai/v1',
-    });
+    const body = await req.json();
+    const messages = body.messages;
+    const question = typeof body.question === "string" ? body.question.trim() : "";
 
-    const { query, messages, chatContext } = await req.json();
-
-    if (!query) {
-      return NextResponse.json({ error: 'Query is required' }, { status: 400 });
+    if (!messages || !Array.isArray(messages) || messages.length === 0) {
+      return NextResponse.json({ error: "No chat messages provided." }, { status: 400 });
+    }
+    if (!question) {
+      return NextResponse.json({ error: "Ask a question about this thread." }, { status: 400 });
+    }
+    if (question.length > MAX_QUESTION_CHARS) {
+      return NextResponse.json({ error: "Question is too long." }, { status: 400 });
     }
 
-    const systemPrompt = `You are ThreadLens AI, an emotional intelligence and relationship analytics assistant. 
-You are given a raw WhatsApp chat transcript between two or more people.
-Your job is to answer the user's question about the conversation dynamics, who said what, emotional patterns, etc.
-Be concise, insightful, and maintain a premium, intelligent tone.
-If the question is about who said sorry more, count the instances accurately.
+    const apiKey = process.env.XAI_API_KEY;
+    if (!apiKey) {
+      return NextResponse.json(
+        { error: "AI is not configured. Add XAI_API_KEY to .env (see README)." },
+        { status: 503 }
+      );
+    }
 
-Here is the conversation context:
-${chatContext}`;
+    const slice = messages.slice(-MAX_MESSAGES);
+    const context = slice
+      .map((m: { sender: string; message: string }) => `${m.sender}: ${m.message}`)
+      .join("\n");
+
+    const openai = new OpenAI({
+      apiKey,
+      baseURL: "https://api.x.ai/v1",
+    });
 
     const completion = await openai.chat.completions.create({
-      model: 'grok-beta', 
+      model: "grok-beta",
       messages: [
-        { role: 'system', content: systemPrompt },
-        ...messages.map((m: any) => ({ role: m.role, content: m.content })),
-        { role: 'user', content: query }
+        {
+          role: "system",
+          content:
+            "You help people understand chat exports: communication patterns, emotional tone, red flags, and practical next steps. Be direct, kind, and never claim to be a therapist or lawyer. If the user asks who texts more, use the message counts in the transcript.",
+        },
+        { role: "user", content: `Chat transcript (recent messages):\n${context}\n\nQuestion: ${question}` },
       ],
-      temperature: 0.2,
+      max_tokens: 800,
+      temperature: 0.7,
     });
 
-    const usage = completion.usage;
-    
-    // Approximate Grok pricing (e.g., $5 per 1M input tokens, $15 per 1M output tokens)
-    let costEstimate = 0;
-    if (usage) {
-      const inputCost = (usage.prompt_tokens / 1000000) * 5.0;
-      const outputCost = (usage.completion_tokens / 1000000) * 15.0;
-      costEstimate = inputCost + outputCost;
-    }
-
-    return NextResponse.json({ 
-      reply: completion.choices[0].message.content,
-      usage: usage,
-      costEstimate: costEstimate.toFixed(5)
-    });
-  } catch (error: any) {
-    console.error('Error calling xAI API:', error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    const answer = completion.choices[0]?.message?.content?.trim() || "No response from the model.";
+    return NextResponse.json({ answer });
+  } catch (error) {
+    console.error("Chat API error:", error);
+    return NextResponse.json({ error: "Failed to get an answer from the AI." }, { status: 500 });
   }
 }

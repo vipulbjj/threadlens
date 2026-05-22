@@ -1,139 +1,152 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { UploadCloud, FileText, CheckCircle2, MessageCircle, Send, MessageSquare } from "lucide-react";
+import { Upload, MessageSquare, Smartphone, AlertCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { Progress } from "@/components/ui/progress";
-import { parseUniversalChat } from "@/lib/parser";
-import { useChatStore } from "@/lib/store";
+import { capImportedMessages, parseUniversalChat, ParseError } from "@/lib/parser";
+import { useChatStore, type ChatPlatform } from "@/lib/store";
 
-type Platform = "whatsapp" | "telegram" | "imessage";
+const PLATFORMS: { id: ChatPlatform; label: string; hint: string }[] = [
+  { id: "whatsapp", label: "WhatsApp", hint: ".txt from Export chat" },
+  { id: "telegram", label: "Telegram", hint: ".txt or .json export" },
+  { id: "imessage", label: "iMessage", hint: ".txt thread export" },
+];
 
 export default function UploadPage() {
-  const [selectedPlatform, setSelectedPlatform] = useState<Platform>("whatsapp");
-  const [file, setFile] = useState<File | null>(null);
-  const [isUploading, setIsUploading] = useState(false);
-  const [progress, setProgress] = useState(0);
   const router = useRouter();
-  const setChat = useChatStore((state) => state.setChat);
+  const setChat = useChatStore((s) => s.setChat);
+  const [platform, setPlatform] = useState<ChatPlatform>("whatsapp");
+  const [error, setError] = useState<string | null>();
+  const [notice, setNotice] = useState<string | null>();
+  const [loading, setLoading] = useState(false);
 
-  const onDrop = useCallback((acceptedFiles: File[]) => {
-    if (acceptedFiles.length > 0) {
-      setFile(acceptedFiles[0]);
-      handleUpload(acceptedFiles[0]);
-    }
-  }, []);
+  const handleUpload = useCallback(
+    async (file: File) => {
+      setError(null);
+      setNotice(null);
+      setLoading(true);
+      try {
+        const text = await file.text();
+        const parsed = parseUniversalChat(text, platform);
+        if (parsed.length === 0) {
+          throw new ParseError("No messages found in that file.");
+        }
+        const { messages, truncated, originalCount } = capImportedMessages(parsed);
+        if (truncated) {
+          setNotice(
+            `Loaded the most recent ${messages.length.toLocaleString()} of ${originalCount.toLocaleString()} messages so your browser stays fast.`
+          );
+        }
+        const name = file.name.replace(/\.[^.]+$/, "") || "Imported chat";
+        const sessionId = setChat(name, messages, platform);
+        router.push(`/chat/${encodeURIComponent(sessionId)}`);
+      } catch (err) {
+        const message = err instanceof ParseError ? err.message : "Could not read that file. Try another export.";
+        setError(message);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [platform, router, setChat]
+  );
+
+  const onDrop = useCallback(
+    (acceptedFiles: File[]) => {
+      const file = acceptedFiles[0];
+      if (file) void handleUpload(file);
+    },
+    [handleUpload]
+  );
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
-    accept: {
-      "text/plain": [".txt"],
-      "application/json": [".json"]
-    },
+    accept: { "text/plain": [".txt"], "application/json": [".json"] },
     maxFiles: 1,
+    disabled: loading,
   });
 
-  const handleUpload = async (uploadedFile: File) => {
-    setIsUploading(true);
-    setProgress(20);
-    
-    try {
-      const text = await uploadedFile.text();
-      setProgress(50);
-      
-      const parsedMessages = parseUniversalChat(text);
-      setProgress(80);
-      
-      setChat(uploadedFile.name, parsedMessages);
-      setProgress(100);
-      
-      setTimeout(() => {
-        router.push(`/chat/${encodeURIComponent(uploadedFile.name)}`);
-      }, 500);
-    } catch (e) {
-      console.error("Failed to parse", e);
-      setIsUploading(false);
-    }
-  };
-
-  const platforms = [
-    { id: "whatsapp", name: "WhatsApp", icon: MessageCircle, color: "text-emerald-500", bg: "bg-emerald-500/10 border-emerald-500/50" },
-    { id: "telegram", name: "Telegram", icon: Send, color: "text-blue-500", bg: "bg-blue-500/10 border-blue-500/50" },
-    { id: "imessage", name: "iMessage", icon: MessageSquare, color: "text-indigo-400", bg: "bg-indigo-500/10 border-indigo-500/50" },
-  ];
-
-  const getInstructions = (platform: Platform) => {
-    switch (platform) {
-      case "whatsapp": return "Open chat > Contact Info > Export Chat > Without Media > Upload .txt file here.";
-      case "telegram": return "Telegram Desktop > Settings > Advanced > Export Telegram Data > Uncheck media, select JSON/TXT.";
-      case "imessage": return "Use a Mac app like iMazing to export the thread to TXT, then drop it below.";
-    }
-  };
-
   return (
-    <div className="flex-1 flex flex-col items-center justify-center p-8 min-h-screen">
-      
-      {/* Platform Selector */}
-      <div className="w-full max-w-2xl mb-8 flex gap-4 justify-center">
-        {platforms.map(p => (
-          <button
-            key={p.id}
-            onClick={() => setSelectedPlatform(p.id as Platform)}
-            className={`flex items-center gap-2 px-6 py-3 rounded-full transition-all border ${selectedPlatform === p.id ? p.bg + " shadow-lg" : "border-white/5 bg-secondary hover:bg-secondary/80 text-muted-foreground"}`}
-          >
-            <p.icon className={`h-5 w-5 ${selectedPlatform === p.id ? p.color : ""}`} />
-            <span className={`font-semibold ${selectedPlatform === p.id ? "text-white" : ""}`}>{p.name}</span>
-          </button>
-        ))}
-      </div>
+    <div className="min-h-screen bg-zinc-950 text-zinc-100 flex flex-col items-center justify-center p-6">
+      <div className="w-full max-w-lg space-y-8">
+        <div className="text-center space-y-2">
+          <h1 className="text-3xl font-bold tracking-tight">Drop your chat export</h1>
+          <p className="text-zinc-400 text-sm">
+            Parsing stays on your device. AI chat sends only the messages you choose to ask about.
+          </p>
+        </div>
 
-      <Card className="w-full max-w-2xl bg-secondary/30 backdrop-blur-xl border-border/50 shadow-2xl">
-        <CardHeader className="text-center">
-          <CardTitle className="text-3xl font-bold">Upload {platforms.find(p => p.id === selectedPlatform)?.name} Chat</CardTitle>
-          <CardDescription className="text-md mt-2">
-            {getInstructions(selectedPlatform)}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          {!file ? (
-            <div
-              {...getRootProps()}
-              className={`border-2 border-dashed rounded-2xl p-16 text-center cursor-pointer transition-all duration-300 ${
-                isDragActive ? "border-emerald-500 bg-emerald-500/10 scale-[1.02]" : "border-white/10 hover:border-emerald-500/50 hover:bg-white/5"
+        <div className="flex justify-center gap-2 flex-wrap">
+          {PLATFORMS.map((p) => (
+            <button
+              key={p.id}
+              type="button"
+              onClick={() => setPlatform(p.id)}
+              className={`min-h-11 px-4 py-2.5 rounded-full text-sm font-medium transition-colors ${
+                platform === p.id
+                  ? "bg-emerald-500 text-zinc-950"
+                  : "bg-zinc-800 text-zinc-300 hover:bg-zinc-700"
               }`}
             >
-              <input {...getInputProps()} />
-              <UploadCloud className={`mx-auto h-16 w-16 mb-6 transition-colors ${isDragActive ? "text-emerald-400" : "text-muted-foreground"}`} />
-              <h3 className="text-xl font-bold text-white mb-2">Drop your export file here</h3>
-              <p className="text-sm text-muted-foreground max-w-sm mx-auto">
-                Strictly privacy-first. We do not store your raw files. Parsing happens instantly in your browser.
-              </p>
-            </div>
-          ) : (
-            <div className="space-y-6">
-              <div className="flex items-center space-x-4 p-5 border border-white/10 rounded-xl bg-secondary/50">
-                <FileText className="h-10 w-10 text-emerald-400" />
-                <div className="flex-1">
-                  <p className="font-semibold text-white">{file.name}</p>
-                  <p className="text-sm text-muted-foreground">{(file.size / 1024).toFixed(2)} KB</p>
-                </div>
-                {progress === 100 && <CheckCircle2 className="h-8 w-8 text-emerald-400" />}
-              </div>
-              {isUploading && (
-                <div className="space-y-3">
-                  <div className="flex justify-between text-sm font-medium">
-                    <span className="text-emerald-400 animate-pulse">Running Universal Parser...</span>
-                    <span>{progress}%</span>
-                  </div>
-                  <Progress value={progress} className="h-2 bg-secondary" />
-                </div>
-              )}
-            </div>
-          )}
-        </CardContent>
-      </Card>
+              {p.label}
+            </button>
+          ))}
+        </div>
+        <p className="text-center text-xs text-zinc-500">{PLATFORMS.find((p) => p.id === platform)?.hint}</p>
+
+        <div
+          {...getRootProps()}
+          className={`min-h-[11rem] border-2 border-dashed rounded-2xl p-12 text-center cursor-pointer transition-colors flex flex-col items-center justify-center ${
+            isDragActive ? "border-emerald-400 bg-emerald-500/10" : "border-zinc-700 hover:border-zinc-500"
+          } ${loading ? "opacity-60 pointer-events-none" : ""}`}
+        >
+          <input {...getInputProps()} />
+          <Upload className="mx-auto h-12 w-12 text-emerald-400 mb-4" />
+          <p className="text-lg font-medium">{loading ? "Reading your file…" : "Drag & drop a .txt or .json file"}</p>
+          <p className="text-sm text-zinc-500 mt-2">or click to browse</p>
+          <p className="text-xs text-zinc-600 mt-3">
+            Try the{" "}
+            <button
+              type="button"
+              className="text-emerald-500/90 hover:underline"
+              onClick={() => {
+                void fetch("/fixtures/sample-whatsapp.txt")
+                  .then((r) => r.blob())
+                  .then((blob) => {
+                    const f = new File([blob], "sample-whatsapp.txt", { type: "text/plain" });
+                    void handleUpload(f);
+                  });
+              }}
+            >
+              sample chat
+            </button>
+          </p>
+        </div>
+
+        {notice && (
+          <div className="rounded-xl border border-amber-500/40 bg-amber-500/10 p-4 text-sm text-amber-100">
+            {notice}
+          </div>
+        )}
+
+        {error && (
+          <div className="flex items-start gap-3 rounded-xl border border-red-500/40 bg-red-500/10 p-4 text-sm text-red-200">
+            <AlertCircle className="h-5 w-5 shrink-0 mt-0.5" />
+            <p>{error}</p>
+          </div>
+        )}
+
+        <div className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-4 text-sm text-zinc-400 space-y-2">
+          <p className="font-medium text-zinc-200 flex items-center gap-2">
+            <Smartphone className="h-4 w-4" /> How to export
+          </p>
+          <ul className="list-disc list-inside space-y-1 text-zinc-500">
+            <li>WhatsApp: Chat → ⋮ → Export chat → Without media → .txt</li>
+            <li>Telegram: Desktop app → Export chat history (.txt or .json)</li>
+            <li>iMessage: Copy thread to Notes or use a Mac export tool → .txt</li>
+          </ul>
+        </div>
+      </div>
     </div>
   );
 }
