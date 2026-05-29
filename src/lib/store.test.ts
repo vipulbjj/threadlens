@@ -12,11 +12,13 @@ describe("chat store", () => {
     const id = useChatStore.getState().setChat(
       "Weekend crew",
       [{ date: "1/1/24", time: "10:00", sender: "Sam", message: "hey" }],
-      "whatsapp"
+      "whatsapp",
+      "couples"
     );
     const state = useChatStore.getState();
     expect(state.sessions).toHaveLength(1);
     expect(state.sessions[0].name).toBe("Weekend crew");
+    expect(state.sessions[0].useCase).toBe("couples");
     expect(state.activeSessionId).toBe(id);
   });
 

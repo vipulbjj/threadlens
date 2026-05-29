@@ -1,25 +1,35 @@
 # ThreadLens
 
-Understand what your group chats are really saying — without sending your whole camera roll to the cloud.
+Turn chat exports into patterns you can talk about — couples conflict prep, friend-group balance, family threads, and more. Parsing stays in your browser.
+
+**Live:** https://threadlens.vercel.app
 
 ## What it does
 
 1. **Export** a chat from WhatsApp, Telegram, or iMessage (`.txt` or `.json`).
-2. **Parse locally** in your browser — the file is not uploaded to our servers for parsing.
-3. **See stats** on the dashboard: who texts most, message counts, apology-style replies.
-4. **Ask questions** with optional AI (xAI Grok). Only the messages needed to answer your question are sent to the API.
+2. **Pick a lens** — couples, friends, family, work, reflection, or general.
+3. **Parse locally** — the file is not uploaded for analytics.
+4. **See insights** — balance, conflict/repair markers, apologies, late-night spikes.
+5. **Ask guided questions** with optional AI (Groq free tier preferred, xAI fallback).
+
+## Use cases
+
+Documented in [docs/USE_CASES.md](docs/USE_CASES.md). Launch copy in [docs/MARKETING.md](docs/MARKETING.md).
 
 ## Privacy (read this)
 
 - Chat **parsing** happens entirely in your browser.
-- **Saved threads** live in your browser’s `localStorage` on this device only.
-- **AI chat** sends message text from the thread you are asking about to [xAI](https://x.ai/) when you click send. We do not run a “zero-knowledge” backend that never sees your messages unless you use AI features.
+- **Saved threads** live in `localStorage` on this device (max 12 sessions, last 8k messages each).
+- **AI chat** sends only recent messages needed for your question to Groq or xAI when you send a prompt—not your whole export.
+- Not therapy, legal, or relationship advice.
 
 ## Setup
 
 ```bash
 npm install
-cp .env.example .env   # add XAI_API_KEY from https://console.x.ai/
+cp .env.example .env
+# Prefer free tier: GROQ_API_KEY from https://console.groq.com/
+# Fallback: XAI_API_KEY from https://console.x.ai/
 npm run dev
 ```
 
@@ -29,12 +39,21 @@ Open [http://localhost:3000](http://localhost:3000).
 
 - `npm run dev` — development server
 - `npm run build` — production build
-- `npm run test` — parser unit tests (Vitest)
+- `npm run test` — unit tests (Vitest)
+- `INTEGRATION_DOWNLOADS=1 npm test` — parse real exports under `~/Downloads/WhatsApp Exports/` (optional, local only)
 
-## Deploy
+## Deploy (Vercel)
 
-Configured for [Vercel](https://vercel.app). Set `XAI_API_KEY` in the Vercel project environment.
+1. Set **`GROQ_API_KEY`** (recommended for viral/free traffic).
+2. Optionally set **`XAI_API_KEY`** as fallback.
+3. `vercel deploy --prod` or push to the connected GitHub repo.
+
+Health check: `GET /api/health` reports which AI provider is configured.
 
 ## Tech
 
-Next.js 16 · React 19 · Zustand · Tailwind CSS 4 · Recharts · OpenAI SDK (xAI API)
+Next.js 16 · React 19 · Zustand · Tailwind CSS 4 · OpenAI SDK (Groq + xAI compatible APIs)
+
+## Contact
+
+Built by [Vipul Bajaj](https://vipulbajaj.com) — feedback welcome via site or LinkedIn (linked in app footer).

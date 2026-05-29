@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
+import type { UseCaseId } from "./use-cases";
 
 export type ChatPlatform = "whatsapp" | "telegram" | "imessage";
 
@@ -16,12 +17,13 @@ export interface ChatSession {
   platform: ChatPlatform;
   messages: ChatMessage[];
   importedAt: string;
+  useCase?: UseCaseId;
 }
 
 interface ChatStore {
   sessions: ChatSession[];
   activeSessionId: string | null;
-  setChat: (name: string, messages: ChatMessage[], platform: ChatPlatform) => string;
+  setChat: (name: string, messages: ChatMessage[], platform: ChatPlatform, useCase?: UseCaseId) => string;
   setActiveSession: (id: string) => void;
   removeSession: (id: string) => void;
   clearAll: () => void;
@@ -36,7 +38,7 @@ export const useChatStore = create<ChatStore>()(
     (set, get) => ({
       sessions: [],
       activeSessionId: null,
-      setChat: (name, messages, platform) => {
+      setChat: (name, messages, platform, useCase) => {
         const id = newSessionId();
         const session: ChatSession = {
           id,
@@ -44,6 +46,7 @@ export const useChatStore = create<ChatStore>()(
           platform,
           messages,
           importedAt: new Date().toISOString(),
+          useCase,
         };
         set((state) => ({
           sessions: [session, ...state.sessions.filter((s) => s.id !== id)].slice(0, 12),

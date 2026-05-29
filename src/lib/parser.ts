@@ -168,12 +168,13 @@ export function getChatStats(messages: ParsedMessage[]) {
   const bySender = senders.map((sender) => {
     const senderMsgs = messages.filter((m) => m.sender === sender);
     const sorryCount = senderMsgs.filter((m) => /\b(sorry|apologize|apologies|my bad)\b/i.test(m.message)).length;
+    const senderChars = senderMsgs.reduce((acc, m) => acc + m.message.length, 0);
     return {
       sender,
       count: senderMsgs.length,
-      avgLength: senderMsgs.length ? Math.round(totalChars / messages.length) : 0,
+      avgLength: senderMsgs.length ? Math.round(senderChars / senderMsgs.length) : 0,
       sorryCount,
-      totalChars: senderMsgs.reduce((acc, m) => acc + m.message.length, 0),
+      totalChars: senderChars,
     };
   });
 

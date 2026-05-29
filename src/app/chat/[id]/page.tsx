@@ -1,11 +1,15 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { Send, BarChart3, ArrowLeft } from "lucide-react";
-import { useChatStore, useActiveSession } from "@/lib/store";
+import { useChatStore } from "@/lib/store";
 import { getChatStats } from "@/lib/parser";
+import { buildThreadInsights } from "@/lib/insights";
+import { getPromptsForUseCase } from "@/lib/prompts";
+import { getUseCase } from "@/lib/use-cases";
+import { InsightPanel } from "@/components/InsightPanel";
 
 interface ChatTurn {
   role: "user" | "assistant";
@@ -18,17 +22,19 @@ export default function ChatPage() {
   const session = useChatStore((s) => s.sessions.find((x) => x.id === sessionId));
   const setActiveSession = useChatStore((s) => s.setActiveSession);
 
+  const useCaseMeta = getUseCase(session?.useCase);
+  const insights = useMemo(
+    () => (session ? buildThreadInsights(session.messages, session.useCase) : []),
+    [session]
+  );
+  const prompts = getPromptsForUseCase(session?.useCase);
+
   const [input, setInput] = useState("");
-  const [chatHistory, setChatHistory] = useState<ChatTurn[]>([
-    {
-      role: "assistant",
-      content: session
-        ? `Loaded **${session.name}** (${session.messages.length} messages, ${session.platform}). Ask anything about tone, red flags, who texts more, or what to say next. Only the messages in this thread are sent to the AI when you ask.`
-        : "Session not found. Go back to the dashboard and import a chat.",
-    },
-  ]);
+  const [showInsights, setShowInsights] = useState(true);
+  const [chatHistory, setChatHistory] = useState<ChatTurn[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>();
+  const [aiProvider, setAiProvider] = useState<string | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -36,14 +42,24 @@ export default function ChatPage() {
   }, [sessionId, setActiveSession]);
 
   useEffect(() => {
+    if (!session) return;
+    setChatHistory([
+      {
+        role: "assistant",
+        content: `Loaded **${session.name}** (${session.messages.length.toLocaleString()} messages). Lens: **${useCaseMeta.label}**. Stats are on-device; tap a guided prompt below or ask your own question.`,
+      },
+    ]);
+  }, [session?.id, session?.messages.length, session?.name, useCaseMeta.label]);
+
+  useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [chatHistory, loading]);
 
   const stats = session ? getChatStats(session.messages) : null;
 
-  const handleSend = async () => {
-    if (!input.trim() || loading || !session) return;
-    const userMessage = input.trim();
+  const ask = async (question: string) => {
+    if (!question.trim() || loading || !session) return;
+    const userMessage = question.trim();
     setInput("");
     setChatHistory((prev) => [...prev, { role: "user", content: userMessage }]);
     setLoading(true);
@@ -53,15 +69,20 @@ export default function ChatPage() {
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: session.messages, question: userMessage }),
+        body: JSON.stringify({
+          messages: session.messages,
+          question: userMessage,
+          useCase: session.useCase,
+        }),
       });
       const data = await res.json();
       if (!res.ok) {
         throw new Error(data.error || "Chat request failed");
       }
+      if (data.provider) setAiProvider(data.provider);
       setChatHistory((prev) => [...prev, { role: "assistant", content: data.answer }]);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong. Check your API key in .env and try again.");
+      setError(err instanceof Error ? err.message : "Something went wrong. AI may be unavailable — stats still work offline.");
       setChatHistory((prev) => prev.slice(0, -1));
     } finally {
       setLoading(false);
@@ -80,48 +101,68 @@ export default function ChatPage() {
   }
 
   return (
-    <div className="flex flex-col h-screen bg-zinc-950 text-zinc-100">
+    <div className="flex flex-col h-screen bg-zinc-950 text-zinc-100 pb-16 md:pb-0">
       <header className="flex items-center gap-3 border-b border-zinc-800 px-4 py-3 shrink-0">
         <Link href="/dashboard" className="text-zinc-400 hover:text-zinc-200" aria-label="Back">
           <ArrowLeft className="h-5 w-5" />
         </Link>
         <div className="min-w-0 flex-1">
           <h1 className="font-semibold truncate">{session.name}</h1>
-          <p className="text-xs text-zinc-500 capitalize">{session.platform} · {session.messages.length} messages</p>
+          <p className="text-xs text-zinc-500 capitalize">
+            {useCaseMeta.emoji} {useCaseMeta.label} · {session.platform} · {session.messages.length.toLocaleString()} msgs
+          </p>
         </div>
-        <Link
-          href={`/dashboard`}
-          className="text-zinc-400 hover:text-emerald-400"
-          title="Stats on dashboard"
+        <button
+          type="button"
+          onClick={() => setShowInsights((v) => !v)}
+          className="text-xs text-zinc-500 hover:text-emerald-400 px-2 py-1"
         >
+          {showInsights ? "Hide insights" : "Insights"}
+        </button>
+        <Link href="/dashboard" className="text-zinc-400 hover:text-emerald-400" title="Dashboard stats">
           <BarChart3 className="h-5 w-5" />
         </Link>
       </header>
 
       {stats && (
         <div className="shrink-0 border-b border-zinc-800/80 px-4 py-2 flex gap-4 overflow-x-auto text-xs text-zinc-400">
-          <span>{stats.totalMessages} msgs</span>
-          <span>Most from {stats.bySender[0]?.sender ?? "—"}</span>
+          <span>{stats.totalMessages.toLocaleString()} msgs</span>
+          <span>Most from {stats.bySender.sort((a, b) => b.count - a.count)[0]?.sender ?? "—"}</span>
         </div>
       )}
 
       <main className="flex-1 overflow-y-auto p-4 space-y-4">
+        {showInsights && <InsightPanel insights={insights} />}
+
+        <div className="flex flex-wrap gap-2">
+          {prompts.map((p) => (
+            <button
+              key={p.id}
+              type="button"
+              disabled={loading}
+              onClick={() => void ask(p.question)}
+              className="rounded-full border border-zinc-700 bg-zinc-900 px-3 py-1.5 text-xs text-zinc-300 hover:border-emerald-500/50 hover:text-emerald-200 disabled:opacity-50"
+            >
+              {p.label}
+            </button>
+          ))}
+        </div>
+
         {chatHistory.map((msg, i) => (
           <div
             key={i}
-            className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
+            className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed whitespace-pre-wrap ${
               msg.role === "user" ? "ml-auto bg-emerald-600 text-white" : "mr-auto bg-zinc-800 text-zinc-100"
             }`}
           >
             {msg.content}
           </div>
         ))}
-        {loading && (
-          <div className="text-sm text-zinc-500 animate-pulse">Thinking…</div>
-        )}
+        {loading && <div className="text-sm text-zinc-500 animate-pulse">Thinking…</div>}
         {error && (
           <div className="rounded-xl border border-red-500/40 bg-red-500/10 px-4 py-3 text-sm text-red-200">
             {error}
+            <p className="text-xs text-zinc-500 mt-2">You can still use thread insights above without AI.</p>
           </div>
         )}
         <div ref={bottomRef} />
@@ -133,14 +174,14 @@ export default function ChatPage() {
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && handleSend()}
+            onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && void ask(input)}
             placeholder="Ask about this thread…"
             className="flex-1 rounded-xl bg-zinc-900 border border-zinc-700 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
             disabled={loading}
           />
           <button
             type="button"
-            onClick={handleSend}
+            onClick={() => void ask(input)}
             disabled={loading || !input.trim()}
             className="rounded-xl bg-emerald-500 px-4 py-3 text-zinc-950 font-semibold hover:bg-emerald-400 disabled:opacity-50 transition-colors"
             aria-label="Send"
@@ -149,7 +190,7 @@ export default function ChatPage() {
           </button>
         </div>
         <p className="text-[10px] text-zinc-500 mt-2 text-center">
-          AI replies use your xAI key. Message text is sent to the API; we do not store chats on a server database.
+          Optional AI sends recent messages to the server{aiProvider ? ` (${aiProvider})` : ""}. Not therapy or legal advice.
         </p>
       </footer>
     </div>

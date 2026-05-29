@@ -16,8 +16,16 @@ const outfit = Outfit({
 });
 
 export const metadata: Metadata = {
-  title: "ThreadLens — Understand your group chats",
-  description: "Upload WhatsApp, Telegram, or iMessage exports. Parse locally. Ask AI about patterns, tone, and red flags.",
+  title: "ThreadLens — Chat insights for couples, friends & teams",
+  description:
+    "Free private chat analytics from WhatsApp, Telegram, or iMessage exports. Conflict patterns, balance, guided prompts. Parsing stays on your device.",
+  openGraph: {
+    title: "ThreadLens — Understand your chats before the hard talk",
+    description: "Import a chat export. See patterns locally. Optional AI with guided prompts for couples and more.",
+    url: "https://threadlens.vercel.app",
+    siteName: "ThreadLens",
+    type: "website",
+  },
 };
 
 export default function RootLayout({

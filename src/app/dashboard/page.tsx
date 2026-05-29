@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { MessageSquare, Upload, Trash2, BarChart3 } from "lucide-react";
 import { useChatStore, useActiveSession } from "@/lib/store";
 import { getChatStats } from "@/lib/parser";
+import { getUseCase } from "@/lib/use-cases";
+import { SiteFooter } from "@/components/SiteFooter";
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -38,7 +40,10 @@ export default function DashboardPage() {
         <div className="max-w-md mx-auto text-center py-16 space-y-4 rounded-2xl border border-zinc-800 bg-zinc-900/40 p-8">
           <MessageSquare className="h-12 w-12 text-emerald-400 mx-auto" />
           <h2 className="text-lg font-semibold">No chats yet</h2>
-          <p className="text-zinc-400 text-sm">Export a thread, drop the file, and we will chart who texts more and flag the vibes.</p>
+          <p className="text-zinc-400 text-sm">
+            Couples use it before hard talks. Friends use it to see who carries the group chat. Export a thread and drop
+            the file.
+          </p>
           <Link href="/upload" className="inline-block text-emerald-400 font-medium hover:underline">
             Go to upload
           </Link>
@@ -48,6 +53,7 @@ export default function DashboardPage() {
           {sessions.map((session) => {
             const sessionStats = getChatStats(session.messages);
             const topSender = sessionStats.bySender.sort((a, b) => b.count - a.count)[0];
+            const uc = getUseCase(session.useCase);
             return (
               <article
                 key={session.id}
@@ -56,7 +62,9 @@ export default function DashboardPage() {
                 <div className="flex items-start justify-between gap-2">
                   <div>
                     <h2 className="font-semibold truncate">{session.name}</h2>
-                    <p className="text-xs text-zinc-500 capitalize">{session.platform}</p>
+                    <p className="text-xs text-zinc-500 capitalize">
+                      {uc.emoji} {uc.label} · {session.platform}
+                    </p>
                   </div>
                   <button
                     type="button"
@@ -70,7 +78,7 @@ export default function DashboardPage() {
                 <dl className="mt-4 grid grid-cols-2 gap-3 text-sm">
                   <div>
                     <dt className="text-zinc-500">Messages</dt>
-                    <dd className="font-medium">{sessionStats.totalMessages}</dd>
+                    <dd className="font-medium">{sessionStats.totalMessages.toLocaleString()}</dd>
                   </div>
                   <div>
                     <dt className="text-zinc-500">Most active</dt>
@@ -110,6 +118,8 @@ export default function DashboardPage() {
           </div>
         </section>
       )}
+
+      <SiteFooter className="max-w-4xl mx-auto mt-12" />
     </div>
   );
 }
