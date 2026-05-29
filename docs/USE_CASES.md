@@ -65,17 +65,17 @@ ThreadLens analyzes exported chat logs **on your device** and optionally answers
 
 ---
 
-## 5. Personal reflection — journaling from chats
+## 5. Situationship / dating
 
-**Who:** Anyone processing a friendship breakup, move, or life chapter through old messages.
+**Who:** People trying to read mutual interest or initiation patterns in early dating threads.
 
 **What ThreadLens shows:**
-- Timeline of volume
-- How your own message length / apology rate changed over time
+- Message balance and who texts first after gaps
+- Tone cues (not mind-reading — text only)
 
 ---
 
-## 6. General — any thread
+## 6. Just exploring — any thread
 
 Default lens when none of the above fits. Same stats and AI with neutral framing.
 
