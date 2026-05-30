@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import type { UseCaseId } from "./use-cases";
+import { persistMessageLimit, readCachedTier } from "./tiers";
 
 export type ChatPlatform = "whatsapp" | "telegram" | "imessage";
 
@@ -67,13 +68,16 @@ export const useChatStore = create<ChatStore>()(
     {
       name: "threadlens-sessions",
       storage: createJSONStorage(() => localStorage),
-      partialize: (state) => ({
-        sessions: state.sessions.map((s) => ({
-          ...s,
-          messages: s.messages.slice(-8000),
-        })),
-        activeSessionId: state.activeSessionId,
-      }),
+      partialize: (state) => {
+        const persistMax = persistMessageLimit(readCachedTier());
+        return {
+          sessions: state.sessions.map((s) => ({
+            ...s,
+            messages: s.messages.slice(-persistMax),
+          })),
+          activeSessionId: state.activeSessionId,
+        };
+      },
     }
   )
 );

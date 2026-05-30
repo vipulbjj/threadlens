@@ -10,6 +10,9 @@ import { buildThreadInsights } from "@/lib/insights";
 import { getPromptsForUseCase } from "@/lib/prompts";
 import { getUseCase } from "@/lib/use-cases";
 import { InsightPanel } from "@/components/InsightPanel";
+import { useAccount } from "@/hooks/useAccount";
+import { PremiumUpsell } from "@/components/PremiumUpsell";
+import { isSupabaseConfigured } from "@/lib/supabase/config";
 
 interface ChatTurn {
   role: "user" | "assistant";
@@ -35,7 +38,10 @@ export default function ChatPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>();
   const [aiProvider, setAiProvider] = useState<string | null>(null);
+  const [quotaExceeded, setQuotaExceeded] = useState(false);
+  const { account, refresh: refreshAccount } = useAccount();
   const bottomRef = useRef<HTMLDivElement>(null);
+  const authRequired = isSupabaseConfigured();
 
   useEffect(() => {
     if (sessionId) setActiveSession(sessionId);
@@ -64,6 +70,13 @@ export default function ChatPage() {
     setChatHistory((prev) => [...prev, { role: "user", content: userMessage }]);
     setLoading(true);
     setError(null);
+    setQuotaExceeded(false);
+
+    if (authRequired && !account?.authenticated) {
+      setError("Sign in to ask AI questions (12 free per day).");
+      setLoading(false);
+      return;
+    }
 
     try {
       const res = await fetch("/api/chat", {
@@ -77,10 +90,14 @@ export default function ChatPage() {
       });
       const data = await res.json();
       if (!res.ok) {
+        if (data.code === "quota_exceeded") {
+          setQuotaExceeded(true);
+        }
         throw new Error(data.error || "Chat request failed");
       }
       if (data.provider) setAiProvider(data.provider);
       setChatHistory((prev) => [...prev, { role: "assistant", content: data.answer }]);
+      void refreshAccount();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong. AI may be unavailable — stats still work offline.");
       setChatHistory((prev) => prev.slice(0, -1));
@@ -159,11 +176,27 @@ export default function ChatPage() {
           </div>
         ))}
         {loading && <div className="text-sm text-zinc-500 animate-pulse">Thinking…</div>}
+        {quotaExceeded && <PremiumUpsell reason="quota" email={account?.email} />}
+
         {error && (
           <div className="rounded-xl border border-red-500/40 bg-red-500/10 px-4 py-3 text-sm text-red-200">
             {error}
+            {error.includes("Sign in") && (
+              <Link href="/login" className="block mt-2 text-emerald-400 text-xs hover:underline">
+                Sign in →
+              </Link>
+            )}
             <p className="text-xs text-zinc-500 mt-2">You can still use thread insights above without AI.</p>
           </div>
+        )}
+
+        {authRequired && account?.authenticated && !account.isPremium && (
+          <p className="text-[10px] text-zinc-600 text-center">
+            Free AI: {account.usage.aiQuestionsToday}/{account.usage.aiLimit} today ·{" "}
+            <Link href="/pricing" className="text-amber-500/80 hover:underline">
+              Premium
+            </Link>
+          </p>
         )}
         <div ref={bottomRef} />
       </main>

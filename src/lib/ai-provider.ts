@@ -9,18 +9,8 @@ export interface ResolvedAiProvider {
   label: string;
 }
 
-/** Prefer Groq (generous free tier) then xAI. Set keys in Vercel env. */
+/** Prefer xAI (your credits), then optional Groq. Set keys in Vercel env. */
 export function resolveAiProvider(): ResolvedAiProvider | null {
-  const groqKey = process.env.GROQ_API_KEY?.trim();
-  if (groqKey) {
-    return {
-      id: "groq",
-      client: new OpenAI({ apiKey: groqKey, baseURL: "https://api.groq.com/openai/v1" }),
-      model: process.env.GROQ_MODEL?.trim() || "llama-3.3-70b-versatile",
-      label: "Groq",
-    };
-  }
-
   const xaiKey = process.env.XAI_API_KEY?.trim();
   if (xaiKey) {
     return {
@@ -28,6 +18,16 @@ export function resolveAiProvider(): ResolvedAiProvider | null {
       client: new OpenAI({ apiKey: xaiKey, baseURL: "https://api.x.ai/v1" }),
       model: process.env.XAI_MODEL?.trim() || "grok-beta",
       label: "xAI",
+    };
+  }
+
+  const groqKey = process.env.GROQ_API_KEY?.trim();
+  if (groqKey) {
+    return {
+      id: "groq",
+      client: new OpenAI({ apiKey: groqKey, baseURL: "https://api.groq.com/openai/v1" }),
+      model: process.env.GROQ_MODEL?.trim() || "llama-3.3-70b-versatile",
+      label: "Groq",
     };
   }
 

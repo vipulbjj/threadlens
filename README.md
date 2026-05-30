@@ -10,7 +10,7 @@ Turn chat exports into patterns you can talk about — couples conflict prep, fr
 2. **Pick a lens** — couples, friends, family, work, reflection, or general.
 3. **Parse locally** — the file is not uploaded for analytics.
 4. **See insights** — balance, conflict/repair markers, apologies, late-night spikes.
-5. **Ask guided questions** with optional AI (Groq free tier preferred, xAI fallback).
+5. **Ask guided questions** with optional AI (xAI preferred; Groq optional fallback). Sign in for 12 free AI questions/day.
 
 ## Use cases
 
@@ -42,13 +42,17 @@ Open [http://localhost:3000](http://localhost:3000).
 - `npm run test` — unit tests (Vitest)
 - `INTEGRATION_DOWNLOADS=1 npm test` — parse real exports under `~/Downloads/WhatsApp Exports/` (optional, local only)
 
+## Auth & Premium
+
+See [docs/SUPABASE_SETUP.md](docs/SUPABASE_SETUP.md). Free tier: 12k message import cap (with warning), 12 AI questions/day. Premium (email-enabled): full import, unlimited AI.
+
 ## Deploy (Vercel)
 
-1. Set **`GROQ_API_KEY`** (recommended for viral/free traffic).
-2. Optionally set **`XAI_API_KEY`** as fallback.
-3. `vercel deploy --prod` or push to the connected GitHub repo.
+1. Set **`XAI_API_KEY`** (primary AI).
+2. Set Supabase vars for sign-in + usage tracking (see SUPABASE_SETUP.md).
+3. Optional: **`GROQ_API_KEY`**, **`PREMIUM_EMAILS`**, **`PREMIUM_CONTACT_EMAIL`**.
 
-Health check: `GET /api/health` reports which AI provider is configured.
+Health check: `GET /api/health` reports AI provider and whether auth is configured.
 
 ## Tech
 

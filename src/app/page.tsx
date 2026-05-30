@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowRight, Shield, Sparkles, MessageCircle, Heart } from "lucide-react";
 import { USE_CASES } from "@/lib/use-cases";
 import { SiteFooter } from "@/components/SiteFooter";
+import { UserMenu } from "@/components/UserMenu";
 
 export default function Home() {
   return (
@@ -10,7 +11,8 @@ export default function Home() {
 
       <header className="relative z-10 mx-auto flex w-full max-w-5xl items-center justify-between px-6 py-6">
         <span className="text-lg font-bold tracking-tight text-white">ThreadLens</span>
-        <nav className="flex items-center gap-4 sm:gap-6 text-sm font-medium text-zinc-400">
+        <nav className="flex items-center gap-3 sm:gap-5 text-sm font-medium text-zinc-400">
+          <UserMenu />
           <Link href="/use-cases" className="hover:text-white transition-colors hidden sm:inline">
             Use cases
           </Link>
@@ -99,7 +101,7 @@ export default function Home() {
               {
                 step: "03",
                 title: "Guided questions (optional)",
-                body: "Tap prompts like “What triggers our fights?” or ask your own. AI uses Groq’s free tier when configured—only recent messages are sent.",
+                body: "Tap prompts like “What triggers our fights?” or ask your own. Sign in for AI (12 free questions/day). Uses your xAI key on the server—only recent messages are sent.",
               },
             ].map((item) => (
               <li key={item.step} className="relative">
@@ -120,8 +122,8 @@ export default function Home() {
               <div>
                 <h3 className="text-lg font-semibold text-white">Privacy, honestly</h3>
                 <p className="mt-2 text-sm text-zinc-400 max-w-xl">
-                  Parsing is local. Optional AI sends only the messages needed for your question to Groq or xAI—we do
-                  not sell your data. Not therapy, legal, or relationship advice.
+                  Parsing is local. Optional AI (xAI on the server) sends only the messages needed for your question. Premium
+                  unlocks full imports and unlimited AI via email. Not therapy, legal, or relationship advice.
                 </p>
               </div>
             </div>
@@ -130,7 +132,7 @@ export default function Home() {
                 <MessageCircle className="h-4 w-4" /> Local parsing
               </span>
               <span className="flex items-center gap-2">
-                <Sparkles className="h-4 w-4" /> Optional AI (Groq / xAI)
+                <Sparkles className="h-4 w-4" /> Optional AI (xAI)
               </span>
             </div>
           </div>

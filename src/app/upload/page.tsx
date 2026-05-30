@@ -8,6 +8,9 @@ import Link from "next/link";
 import { capImportedMessages, parseUniversalChat, ParseError } from "@/lib/parser";
 import { useChatStore, type ChatPlatform } from "@/lib/store";
 import { USE_CASES, type UseCaseId } from "@/lib/use-cases";
+import { useAccount } from "@/hooks/useAccount";
+import { tierFromPremium, getLimits } from "@/lib/tiers";
+import { PremiumUpsell } from "@/components/PremiumUpsell";
 
 const PLATFORMS: { id: ChatPlatform; label: string; hint: string }[] = [
   { id: "whatsapp", label: "WhatsApp", hint: ".txt from Export chat" },
@@ -17,6 +20,9 @@ const PLATFORMS: { id: ChatPlatform; label: string; hint: string }[] = [
 
 export default function UploadPage() {
   const router = useRouter();
+  const { account } = useAccount();
+  const tier = tierFromPremium(Boolean(account?.isPremium));
+  const limits = getLimits(tier);
   const setChat = useChatStore((s) => s.setChat);
   const [platform, setPlatform] = useState<ChatPlatform>("whatsapp");
   const [useCase, setUseCase] = useState<UseCaseId>("couples");
@@ -35,10 +41,16 @@ export default function UploadPage() {
         if (parsed.length === 0) {
           throw new ParseError("No messages found in that file.");
         }
-        const { messages, truncated, originalCount } = capImportedMessages(parsed);
+        const { messages, truncated, originalCount } = capImportedMessages(parsed, tier);
         if (truncated) {
           setNotice(
-            `Loaded the most recent ${messages.length.toLocaleString()} of ${originalCount.toLocaleString()} messages so your browser stays fast.`
+            account?.isPremium
+              ? `Loaded the most recent ${messages.length.toLocaleString()} of ${originalCount.toLocaleString()} messages (browser safety cap).`
+              : `Loaded the most recent ${messages.length.toLocaleString()} of ${originalCount.toLocaleString()} messages. Free tier keeps 12k — Premium imports the full thread.`
+          );
+        } else if (originalCount > 50_000) {
+          setNotice(
+            `Parsed ${originalCount.toLocaleString()} messages in your browser. Very large threads may feel slow on older devices.`
           );
         }
         const name = file.name.replace(/\.[^.]+$/, "") || "Imported chat";
@@ -51,7 +63,7 @@ export default function UploadPage() {
         setLoading(false);
       }
     },
-    [platform, useCase, router, setChat]
+    [platform, useCase, router, setChat, tier, account?.isPremium]
   );
 
   const onDrop = useCallback(
@@ -66,7 +78,12 @@ export default function UploadPage() {
     onDrop,
     accept: { "text/plain": [".txt"], "application/json": [".json"] },
     maxFiles: 1,
-    maxSize: 25 * 1024 * 1024,
+    maxSize: limits.maxUploadBytes,
+    onDropRejected: () => {
+      setError(
+        `File is too large for the ${tier} tier (max ${Math.round(limits.maxUploadBytes / (1024 * 1024))} MB). Request Premium for 200 MB exports.`
+      );
+    },
     disabled: loading,
   });
 
@@ -133,7 +150,9 @@ export default function UploadPage() {
           <input {...getInputProps()} />
           <Upload className="mx-auto h-12 w-12 text-emerald-400 mb-4" />
           <p className="text-lg font-medium">{loading ? "Reading your file…" : "Drag & drop a .txt or .json file"}</p>
-          <p className="text-sm text-zinc-500 mt-2">Max 25 MB · or click to browse</p>
+          <p className="text-sm text-zinc-500 mt-2">
+            Max {Math.round(limits.maxUploadBytes / (1024 * 1024))} MB · large files are parsed, then trimmed if needed
+          </p>
           <p className="text-xs text-zinc-600 mt-3">
             Try the{" "}
             <button
@@ -158,6 +177,10 @@ export default function UploadPage() {
           <div className="rounded-xl border border-amber-500/40 bg-amber-500/10 p-4 text-sm text-amber-100">
             {notice}
           </div>
+        )}
+
+        {notice?.includes("Free tier") && !account?.isPremium && (
+          <PremiumUpsell reason="import" email={account?.email} />
         )}
 
         {error && (

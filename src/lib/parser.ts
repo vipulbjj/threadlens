@@ -1,4 +1,5 @@
 import type { ChatPlatform } from "./store";
+import { capMessagesForTier, type AccountTier } from "./tiers";
 
 export interface ParsedMessage {
   date: string;
@@ -148,18 +149,11 @@ function parseGeneric(text: string) {
   return messages;
 }
 
-/** Keep imports bounded for browser memory and localStorage. */
+/** @deprecated Use capImportedMessages(messages, tier) */
 export const MAX_IMPORT_MESSAGES = 12_000;
 
-export function capImportedMessages(messages: ParsedMessage[]) {
-  if (messages.length <= MAX_IMPORT_MESSAGES) {
-    return { messages, truncated: false, originalCount: messages.length };
-  }
-  return {
-    messages: messages.slice(-MAX_IMPORT_MESSAGES),
-    truncated: true,
-    originalCount: messages.length,
-  };
+export function capImportedMessages(messages: ParsedMessage[], tier: AccountTier = "free") {
+  return { ...capMessagesForTier(messages, tier), tier };
 }
 
 export function getChatStats(messages: ParsedMessage[]) {
