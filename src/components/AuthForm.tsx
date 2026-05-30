@@ -73,7 +73,7 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
       <div className="text-center">
         <h1 className="text-2xl font-bold text-white">{title}</h1>
         <p className="text-sm text-zinc-400 mt-2">
-          {mode === "login" && "Free tier: 12 AI questions per day. Premium via email."}
+          {mode === "login" && "Free tier: 30 AI questions per day. Premium via email."}
           {mode === "signup" && "Parsing stays on your device. Sign in to use AI."}
           {mode === "forgot" && "We'll email you a link to set a new password."}
         </p>

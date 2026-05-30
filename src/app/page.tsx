@@ -101,7 +101,7 @@ export default function Home() {
               {
                 step: "03",
                 title: "Guided questions (optional)",
-                body: "Tap prompts like “What triggers our fights?” or ask your own. Sign in for AI (12 free questions/day). Uses your xAI key on the server—only recent messages are sent.",
+                body: "Tap prompts like “What triggers our fights?” or ask your own. Sign in for AI (30 free questions/day). Uses your xAI key on the server—only recent messages are sent.",
               },
             ].map((item) => (
               <li key={item.step} className="relative">

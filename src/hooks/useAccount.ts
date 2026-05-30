@@ -28,7 +28,7 @@ export function useAccount() {
         authenticated: false,
         authEnabled: false,
         isPremium: false,
-        usage: { tier: "free", aiQuestionsToday: 0, aiLimit: 12, canAskAi: true, isPremium: false },
+        usage: { tier: "free", aiQuestionsToday: 0, aiLimit: 30, canAskAi: true, isPremium: false },
       });
       writeCachedTier("free");
     } finally {

@@ -46,7 +46,7 @@ export default function UploadPage() {
           setNotice(
             account?.isPremium
               ? `Loaded the most recent ${messages.length.toLocaleString()} of ${originalCount.toLocaleString()} messages (browser safety cap).`
-              : `Loaded the most recent ${messages.length.toLocaleString()} of ${originalCount.toLocaleString()} messages. Free tier keeps 12k — Premium imports the full thread.`
+              : `Loaded the most recent ${messages.length.toLocaleString()} of ${originalCount.toLocaleString()} messages. Free tier keeps 20k — Premium imports the full thread.`
           );
         } else if (originalCount > 50_000) {
           setNotice(
@@ -81,7 +81,7 @@ export default function UploadPage() {
     maxSize: limits.maxUploadBytes,
     onDropRejected: () => {
       setError(
-        `File is too large for the ${tier} tier (max ${Math.round(limits.maxUploadBytes / (1024 * 1024))} MB). Request Premium for 200 MB exports.`
+        `File is too large for the ${tier} tier (max ${Math.round(limits.maxUploadBytes / (1024 * 1024))} MB). Premium supports much larger exports if your device can handle them.`
       );
     },
     disabled: loading,

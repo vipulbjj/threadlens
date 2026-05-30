@@ -150,7 +150,7 @@ function parseGeneric(text: string) {
 }
 
 /** @deprecated Use capImportedMessages(messages, tier) */
-export const MAX_IMPORT_MESSAGES = 12_000;
+export const MAX_IMPORT_MESSAGES = 20_000;
 
 export function capImportedMessages(messages: ParsedMessage[], tier: AccountTier = "free") {
   return { ...capMessagesForTier(messages, tier), tier };

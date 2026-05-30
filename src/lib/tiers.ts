@@ -1,19 +1,21 @@
 export type AccountTier = "free" | "premium";
 
+/** Browser parsing + localStorage are the real caps; tier limits are guardrails, not paywalls. */
 export const TIER_LIMITS = {
   free: {
-    maxImportMessages: 12_000,
-    maxPersistMessages: 8_000,
-    maxAiQuestionsPerDay: 12,
-    maxContextMessages: 400,
-    maxUploadBytes: 80 * 1024 * 1024,
+    maxImportMessages: 20_000,
+    maxPersistMessages: 10_000,
+    maxAiQuestionsPerDay: 30,
+    maxContextMessages: 500,
+    maxUploadBytes: 100 * 1024 * 1024,
   },
   premium: {
     maxImportMessages: Number.POSITIVE_INFINITY,
     maxPersistMessages: 80_000,
     maxAiQuestionsPerDay: Number.POSITIVE_INFINITY,
     maxContextMessages: 2_000,
-    maxUploadBytes: 200 * 1024 * 1024,
+    /** No artificial cap — large exports are limited by device RAM, not billing. */
+    maxUploadBytes: 512 * 1024 * 1024,
   },
 } as const;
 

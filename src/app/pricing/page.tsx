@@ -21,9 +21,9 @@ export default function PricingPage() {
             <h2 className="font-semibold text-lg">Free</h2>
             <ul className="mt-4 space-y-2 text-sm text-zinc-400">
               <li>Local parsing & insights</li>
-              <li>Last 12,000 messages per import (with warning)</li>
-              <li>12 AI questions per day (signed in)</li>
-              <li>Up to 80 MB export files</li>
+              <li>Last 20,000 messages per import (with warning)</li>
+              <li>30 AI questions per day (signed in)</li>
+              <li>Up to 100 MB export files</li>
             </ul>
           </div>
           <div className="rounded-2xl border border-amber-500/40 bg-amber-500/10 p-6">
@@ -35,7 +35,7 @@ export default function PricingPage() {
               <li>Full chat import — no message cap</li>
               <li>Unlimited AI questions</li>
               <li>Larger context for answers</li>
-              <li>Up to 200 MB exports</li>
+              <li>Very large exports (up to ~512 MB — device memory is the limit)</li>
             </ul>
             <Link
               href="/account"

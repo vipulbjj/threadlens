@@ -42,7 +42,7 @@ export async function POST(req: Request) {
         } = await supabase.auth.getUser();
         if (!user?.email) {
           return NextResponse.json(
-            { error: "Sign in to use AI questions (free tier includes 12 per day)." },
+            { error: "Sign in to use AI questions (free tier includes 30 per day)." },
             { status: 401 }
           );
         }

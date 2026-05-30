@@ -10,7 +10,7 @@ Turn chat exports into patterns you can talk about — couples conflict prep, fr
 2. **Pick a lens** — couples, friends, family, work, reflection, or general.
 3. **Parse locally** — the file is not uploaded for analytics.
 4. **See insights** — balance, conflict/repair markers, apologies, late-night spikes.
-5. **Ask guided questions** with optional AI (xAI preferred; Groq optional fallback). Sign in for 12 free AI questions/day.
+5. **Ask guided questions** with optional AI (xAI preferred; Groq optional fallback). Sign in for 30 free AI questions/day.
 
 ## Use cases
 
@@ -44,7 +44,7 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ## Auth & Premium
 
-See [docs/SUPABASE_SETUP.md](docs/SUPABASE_SETUP.md). Free tier: 12k message import cap (with warning), 12 AI questions/day. Premium (email-enabled): full import, unlimited AI.
+See [docs/SUPABASE_SETUP.md](docs/SUPABASE_SETUP.md). Free tier: 20k message import cap (with warning), 30 AI questions/day, 100 MB uploads. Premium (email-enabled): full import, unlimited AI, very large exports.
 
 ## Deploy (Vercel)
 

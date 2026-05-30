@@ -73,7 +73,7 @@ export default function ChatPage() {
     setQuotaExceeded(false);
 
     if (authRequired && !account?.authenticated) {
-      setError("Sign in to ask AI questions (12 free per day).");
+      setError("Sign in to ask AI questions (30 free per day).");
       setLoading(false);
       return;
     }

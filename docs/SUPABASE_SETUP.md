@@ -1,12 +1,13 @@
 # Supabase setup for ThreadLens auth
 
-1. Create a project at [supabase.com](https://supabase.com) (free tier is fine).
-2. Run `supabase/schema.sql` in the SQL editor.
-3. In **Authentication → URL configuration**, set:
+1. Create a project at [supabase.com](https://supabase.com) named **threadlens** (free tier is fine).
+2. In **Project Settings → API**, create a **new API key** named `threadlens` (or use the default anon + service_role keys).
+3. Run `supabase/schema.sql` in the SQL editor.
+4. In **Authentication → URL configuration**, set:
    - Site URL: `https://threadlens.vercel.app`
    - Redirect URLs: `https://threadlens.vercel.app/auth/callback`, `http://localhost:3000/auth/callback`
-4. Enable **Email** provider. Confirm email if you want verification on signup.
-5. Add Vercel environment variables:
+5. Enable **Email** provider. Confirm email if you want verification on signup.
+6. Add Vercel environment variables:
 
 | Variable | Where |
 |----------|--------|
@@ -14,7 +15,7 @@
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Project Settings → API |
 | `SUPABASE_SERVICE_ROLE_KEY` | Project Settings → API (server only, never expose to client) |
 | `XAI_API_KEY` | xAI console (primary AI) |
-| `PREMIUM_EMAILS` | Comma-separated emails to auto-enable premium, e.g. `you@startup.com` |
+| `PREMIUM_EMAILS` | Comma-separated emails to auto-enable premium, e.g. `vbajaj56@gmail.com` |
 | `PREMIUM_CONTACT_EMAIL` | Inbox for premium requests (also set `NEXT_PUBLIC_PREMIUM_CONTACT_EMAIL` for client mailto links) |
 
 ## Enable premium for a user
@@ -28,3 +29,17 @@ Users can also tap **Request Premium** in the app — rows land in `premium_requ
 ## Forgot password
 
 Uses Supabase `resetPasswordForEmail` → link opens `/auth/callback` → user sets password on `/account`.
+
+## Tier limits (in app code)
+
+| | Free | Premium |
+|---|------|---------|
+| Import cap | Last 20k messages | Full thread |
+| AI questions / day | 30 (signed in) | Unlimited |
+| Upload file size | 100 MB | ~512 MB (device RAM is the real limit) |
+
+Premium upload is not capped at 200 MB anymore — that was an arbitrary guardrail. Parsing runs in the browser, so very large `.txt` files depend on phone/laptop memory, not Supabase.
+
+## Cursor Supabase MCP
+
+If the agent should create the project for you: complete **Supabase MCP** auth when Cursor prompts (Settings → MCP → Supabase → authenticate). Until that finishes, only `mcp_auth` is available and dashboard automation is blocked.
