@@ -317,7 +317,7 @@ export function buildThreadInsights(messages: ParsedMessage[], useCase?: UseCase
       detail:
         topInitPct > 65
           ? `${topInit} starts ${topInitPct}% of conversations (after 4+ hour gaps). Noticeable imbalance.`
-          : `Fairly mutual — ${initEntries.map(([s, n]) => `${s} ${pct(n, totalInits)}%`).join(", ")}.`,
+          : `Fairly mutual — ${initEntries.filter(([, n]) => n > 0).map(([s, n]) => `${s} ${pct(n, totalInits)}%`).join(", ")}.`,
       severity: topInitPct > 65 ? "note" : "highlight",
     });
   }
