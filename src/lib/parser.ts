@@ -71,25 +71,52 @@ export function parseUniversalChat(text: string, platform: ChatPlatform = "whats
   );
 }
 
+/** WhatsApp lines always start with a date stamp; continuation lines do not. */
+const WA_BRACKET_LINE =
+  /^\u200e?\[(\d{1,2}\/\d{1,2}\/\d{2,4}),\s(\d{1,2}:\d{2}(?::\d{2})?(?:\s?[AP]M)?)\]\s([^:]+):\s(.*)$/i;
+const WA_PLAIN_LINE =
+  /^\u200e?(\d{1,2}\/\d{1,2}\/\d{2,4}),\s(\d{1,2}:\d{2}(?::\d{2})?(?:\s?[AP]M)?)\s-\s([^:]+):\s(.*)$/i;
+
 function parseWhatsApp(text: string) {
   const messages: ParsedMessage[] = [];
-  const bracketed =
-    /\[(\d{1,2}\/\d{1,2}\/\d{2,4}),\s(\d{1,2}:\d{2}(?::\d{2})?(?:\s?[AP]M)?)\]\s([^:]+):\s([\s\S]*?)(?=\[\d{1,2}\/\d{1,2}\/\d{2,4},|\d{1,2}\/\d{1,2}\/\d{2,4},|$)/gi;
-  const plain =
-    /(\d{1,2}\/\d{1,2}\/\d{2,4}),\s(\d{1,2}:\d{2}(?:\s?[AP]M)?)\s-([^:]+):\s([\s\S]*?)(?=\d{1,2}\/\d{1,2}\/\d{2,4},|\d{1,2}:\d{2}|$)/gi;
+  let current: ParsedMessage | null = null;
+  /** Stick to the export's native line format so pasted/forwarded snippets in the other format stay in the same bubble. */
+  let exportFormat: "bracket" | "plain" | null = null;
 
-  for (const re of [bracketed, plain]) {
-    re.lastIndex = 0;
-    let match: RegExpExecArray | null;
-    while ((match = re.exec(text)) !== null) {
-      pushMessage(messages, {
-        date: match[1],
-        time: match[2],
-        sender: match[3].trim(),
-        message: match[4].trim(),
-      });
+  for (const rawLine of text.split(/\r?\n/)) {
+    const line = rawLine.trimEnd();
+    const bracket = line.match(WA_BRACKET_LINE);
+    const plain = !bracket ? line.match(WA_PLAIN_LINE) : null;
+
+    const isBracketHeader = Boolean(bracket);
+    const isPlainHeader = Boolean(plain);
+    const header = bracket ?? plain;
+
+    if (header) {
+      const lineFormat = isBracketHeader ? "bracket" : "plain";
+      if (exportFormat === null) exportFormat = lineFormat;
+
+      const countsAsNewMessage = lineFormat === exportFormat;
+      if (countsAsNewMessage) {
+        if (current) pushMessage(messages, current);
+        current = {
+          date: header[1],
+          time: header[2],
+          sender: header[3].trim(),
+          message: (header[4] ?? "").trim(),
+        };
+        continue;
+      }
+      // Other-format line inside a message (e.g. forwarded chat snippet) — append below.
+    }
+
+    if (current && line.length > 0) {
+      current.message = current.message ? `${current.message}\n${line}` : line;
+    } else if (!header && line.length > 0 && !current) {
+      // Preamble lines before the first message (export header) — ignore.
     }
   }
+  if (current) pushMessage(messages, current);
   return messages;
 }
 
@@ -172,10 +199,25 @@ export function getChatStats(messages: ParsedMessage[]) {
     };
   });
 
+  const sorted = [...bySender].sort((a, b) => b.count - a.count);
+  const total = messages.length;
+  const topTwoCount = sorted.slice(0, 2).reduce((n, s) => n + s.count, 0);
+  // 1:1 chat: two people account for ~all messages; other "senders" are parse artifacts
+  // (forwarded snippets, pasted lines, contact cards) with tiny counts.
+  const isOneToOne = sorted.length >= 2 && total > 0 && topTwoCount / total >= 0.98;
+  const minPrimaryCount = Math.max(25, Math.round(total * 0.002));
+  const primaryBySender = isOneToOne
+    ? sorted.slice(0, 2)
+    : sorted.filter((s) => s.count >= minPrimaryCount);
+  const incidentalSenders = sorted.filter((s) => !primaryBySender.includes(s));
+
   return {
     senders,
-    totalMessages: messages.length,
-    avgMessageLength: messages.length ? Math.round(totalChars / messages.length) : 0,
+    totalMessages: total,
+    avgMessageLength: total ? Math.round(totalChars / total) : 0,
     bySender,
+    primaryBySender,
+    incidentalSenders,
+    isOneToOne,
   };
 }

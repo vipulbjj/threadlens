@@ -121,10 +121,14 @@ export default function DashboardPage() {
               <BarChart3 className="h-5 w-5 text-emerald-400" />
               {active.name}
             </h2>
-            <p className="text-xs text-[var(--color-muted-foreground)] mt-0.5">Messages sent by each participant</p>
+            <p className="text-xs text-[var(--color-muted-foreground)] mt-0.5">
+              {stats.isOneToOne
+                ? "1:1 chat — only the two people who actually messaged"
+                : "Messages sent by each participant"}
+            </p>
           </div>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {stats.bySender.slice(0, 6).map((row) => (
+            {stats.primaryBySender.slice(0, 6).map((row) => (
               <div key={row.sender} className="rounded-xl bg-[var(--color-background)] p-4 border border-[var(--color-border)]">
                 <div className="flex items-center gap-1.5 mb-1">
                   <User className="h-3.5 w-3.5 text-[var(--color-muted-foreground)] shrink-0" />
@@ -138,6 +142,28 @@ export default function DashboardPage() {
               </div>
             ))}
           </div>
+          {stats.incidentalSenders.length > 0 && (
+            <p className="text-xs text-[var(--color-muted-foreground)] mt-4 leading-relaxed">
+              {stats.isOneToOne ? (
+                <>
+                  Names like{" "}
+                  {stats.incidentalSenders
+                    .slice(0, 4)
+                    .map((s) => s.sender)
+                    .join(", ")}
+                  {stats.incidentalSenders.length > 4 ? "…" : ""} are not other people in this chat —
+                  they come from forwarded or pasted snippets inside messages (a few lines each), not
+                  real replies.
+                </>
+              ) : (
+                <>
+                  {stats.incidentalSenders.length} low-count name
+                  {stats.incidentalSenders.length === 1 ? "" : "s"} hidden — likely quoted or
+                  forwarded text, not active participants.
+                </>
+              )}
+            </p>
+          )}
         </section>
       )}
 

@@ -32,6 +32,16 @@ describe("parseUniversalChat", () => {
     expect(messages[0].sender).toBe("Alice");
   });
 
+  it("keeps multi-line message body as one message (no false senders)", () => {
+    const text = `[1/8/24, 10:15:32 AM] Alice: Forwarded thread below
+1/8/24, 9:00 AM - Josh Will: This should stay inside Alice's message
+still part of the same bubble`;
+    const messages = parseUniversalChat(text, "whatsapp");
+    expect(messages).toHaveLength(1);
+    expect(messages[0].sender).toBe("Alice");
+    expect(messages[0].message).toContain("Josh Will");
+  });
+
   it("throws helpful message for unknown blob", () => {
     expect(() => parseUniversalChat("hello world", "whatsapp")).toThrow(
       /could not find messages/i

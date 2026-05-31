@@ -120,7 +120,7 @@ export function buildFullThreadStats(messages: ParsedMessage[], useCase?: UseCas
 
   // Overview
   lines.push(
-    `Thread: ${total.toLocaleString()} messages · ${stats.senders.length} participants · ${messages[0].date}–${messages[messages.length - 1].date}`
+    `Thread: ${total.toLocaleString()} messages · ${(stats.isOneToOne ? 2 : stats.senders.length)} participants · ${messages[0].date}–${messages[messages.length - 1].date}`
   );
 
   // Message share
@@ -226,14 +226,14 @@ export function buildThreadInsights(messages: ParsedMessage[], useCase?: UseCase
   const sorted = [...stats.bySender].sort((a, b) => b.count - a.count);
   const top = sorted[0];
   const second = sorted[1];
-  const isTwoPerson = stats.senders.length === 2;
+  const isTwoPerson = stats.isOneToOne ?? stats.senders.length === 2;
 
   // ── Always shown ──────────────────────────────────────────────────────────
 
   insights.push({
     id: "volume",
     title: "Message volume",
-    detail: `${total.toLocaleString()} messages across ${stats.senders.length} ${stats.senders.length === 1 ? "person" : "people"}.`,
+    detail: `${total.toLocaleString()} messages across ${stats.isOneToOne ? 2 : stats.senders.length} ${stats.isOneToOne || stats.senders.length !== 1 ? "people" : "person"}.`,
     severity: "neutral",
   });
 
