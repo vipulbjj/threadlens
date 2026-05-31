@@ -19,11 +19,19 @@ export const metadata: Metadata = {
   title: "ThreadLens — Chat insights for couples, friends & teams",
   description:
     "Free private chat analytics from WhatsApp, Telegram, or iMessage exports. Conflict patterns, balance, guided prompts. Parsing stays on your device.",
+  icons: {
+    icon: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/icon.png", type: "image/png", sizes: "512x512" },
+    ],
+    apple: { url: "/apple-touch-icon.png", sizes: "512x512" },
+  },
   openGraph: {
     title: "ThreadLens — Understand your chats before the hard talk",
     description: "Import a chat export. See patterns locally. Optional AI with guided prompts for couples and more.",
     url: "https://threadlens.vercel.app",
     siteName: "ThreadLens",
+    images: [{ url: "/apple-touch-icon.png", width: 512, height: 512, alt: "ThreadLens" }],
     type: "website",
   },
 };
