@@ -11,6 +11,7 @@ import { USE_CASES, type UseCaseId } from "@/lib/use-cases";
 import { useAccount } from "@/hooks/useAccount";
 import { tierFromPremium, getLimits } from "@/lib/tiers";
 import { PremiumUpsell } from "@/components/PremiumUpsell";
+import { UserMenu } from "@/components/UserMenu";
 
 const PLATFORMS: { id: ChatPlatform; label: string; hint: string }[] = [
   { id: "whatsapp", label: "WhatsApp", hint: ".txt from Export chat" },
@@ -92,6 +93,9 @@ export default function UploadPage() {
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-100 flex flex-col items-center justify-center p-6 pb-24">
       <div className="w-full max-w-lg space-y-8">
+        <div className="flex justify-end">
+          <UserMenu />
+        </div>
         <div className="text-center space-y-2">
           <h1 className="text-3xl font-bold tracking-tight">Drop your chat export</h1>
           <p className="text-zinc-400 text-sm">

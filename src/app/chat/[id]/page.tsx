@@ -12,6 +12,7 @@ import { getUseCase } from "@/lib/use-cases";
 import { InsightPanel } from "@/components/InsightPanel";
 import { useAccount } from "@/hooks/useAccount";
 import { PremiumUpsell } from "@/components/PremiumUpsell";
+import { UserMenu } from "@/components/UserMenu";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 
 interface ChatTurn {
@@ -139,6 +140,7 @@ export default function ChatPage() {
         <Link href="/dashboard" className="text-zinc-400 hover:text-emerald-400" title="Dashboard stats">
           <BarChart3 className="h-5 w-5" />
         </Link>
+        <UserMenu />
       </header>
 
       {stats && (

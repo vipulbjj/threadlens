@@ -7,9 +7,12 @@ import { useChatStore, useActiveSession } from "@/lib/store";
 import { getChatStats } from "@/lib/parser";
 import { getUseCase } from "@/lib/use-cases";
 import { SiteFooter } from "@/components/SiteFooter";
+import { AppHeader } from "@/components/AppHeader";
+import { useAccount } from "@/hooks/useAccount";
 
 export default function DashboardPage() {
   const router = useRouter();
+  const { account } = useAccount();
   const sessions = useChatStore((s) => s.sessions);
   const removeSession = useChatStore((s) => s.removeSession);
   const active = useActiveSession();
@@ -18,15 +21,14 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-100 p-6 pb-24">
-      <header className="max-w-4xl mx-auto flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">Your threads</h1>
-          <p className="text-zinc-400 text-sm mt-1">
-            {sessions.length === 0
-              ? "Import a chat to see patterns and ask questions."
-              : `${sessions.length} saved on this device`}
-          </p>
-        </div>
+      <AppHeader
+        title="Your threads"
+        subtitle={
+          sessions.length === 0
+            ? "Import a chat to see patterns and ask questions."
+            : `${sessions.length} saved on this device`
+        }
+      >
         <Link
           href="/upload"
           className="inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-500 px-4 py-2.5 text-sm font-semibold text-zinc-950 hover:bg-emerald-400 transition-colors"
@@ -34,7 +36,13 @@ export default function DashboardPage() {
           <Upload className="h-4 w-4" />
           Import chat
         </Link>
-      </header>
+      </AppHeader>
+
+      {account?.isPremium && (
+        <p className="max-w-4xl mx-auto -mt-4 mb-6 text-sm text-amber-200/90">
+          Premium active — full imports and unlimited AI questions.
+        </p>
+      )}
 
       {sessions.length === 0 ? (
         <div className="max-w-md mx-auto text-center py-16 space-y-4 rounded-2xl border border-zinc-800 bg-zinc-900/40 p-8">

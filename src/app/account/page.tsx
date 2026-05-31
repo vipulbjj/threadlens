@@ -5,6 +5,8 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AuthForm } from "@/components/AuthForm";
 import { PremiumUpsell } from "@/components/PremiumUpsell";
+import { UserMenu } from "@/components/UserMenu";
+import { Crown } from "lucide-react";
 import { useAccount } from "@/hooks/useAccount";
 import { createClient } from "@/lib/supabase/client";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
@@ -51,14 +53,20 @@ export default function AccountPage() {
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-100 p-6 pb-24">
       <div className="max-w-lg mx-auto space-y-8">
-        <Link href="/dashboard" className="text-sm text-zinc-500 hover:text-zinc-300">
-          ← Dashboard
-        </Link>
+        <div className="flex items-center justify-between gap-4">
+          <Link href="/dashboard" className="text-sm text-zinc-500 hover:text-zinc-300">
+            ← Dashboard
+          </Link>
+          <UserMenu />
+        </div>
         <div>
           <h1 className="text-2xl font-bold">Account</h1>
           <p className="text-sm text-zinc-400 mt-1">{account.email}</p>
           {account.isPremium ? (
-            <p className="mt-2 text-sm text-amber-200">Premium active — full imports & unlimited AI.</p>
+            <p className="mt-3 inline-flex items-center gap-2 rounded-full border border-amber-500/40 bg-amber-500/15 px-3 py-1.5 text-sm font-medium text-amber-200">
+              <Crown className="h-4 w-4" />
+              Premium active — full imports & unlimited AI
+            </p>
           ) : (
             <p className="mt-2 text-sm text-zinc-500">
               Free plan · {account.usage.aiQuestionsToday} / {account.usage.aiLimit} AI questions used today

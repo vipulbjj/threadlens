@@ -45,13 +45,18 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
       }
 
       if (mode === "signup") {
-        const { error: err } = await supabase.auth.signUp({
+        const { data, error: err } = await supabase.auth.signUp({
           email,
           password,
           options: { emailRedirectTo: `${origin}/auth/callback?next=/dashboard` },
         });
         if (err) throw err;
-        setInfo("Check your email to confirm your account, then sign in.");
+        if (data.session) {
+          router.push("/dashboard");
+          router.refresh();
+          return;
+        }
+        setInfo("Account created. You can sign in now — we do not require email confirmation on ThreadLens.");
         return;
       }
 
