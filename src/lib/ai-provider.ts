@@ -16,7 +16,7 @@ export function resolveAiProvider(): ResolvedAiProvider | null {
     return {
       id: "xai",
       client: new OpenAI({ apiKey: xaiKey, baseURL: "https://api.x.ai/v1" }),
-      model: process.env.XAI_MODEL?.trim() || "grok-beta",
+      model: process.env.XAI_MODEL?.trim() || "grok-4-20-0309-non-reasoning",
       label: "xAI",
     };
   }

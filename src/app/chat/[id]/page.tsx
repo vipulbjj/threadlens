@@ -105,6 +105,7 @@ export default function ChatPage() {
       const tier = account ? tierFromPremium(account.isPremium) : readCachedTier();
       const res = await fetch("/api/chat", {
         method: "POST",
+        credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           messages: sliceMessagesForAiPayload(session.messages, tier),

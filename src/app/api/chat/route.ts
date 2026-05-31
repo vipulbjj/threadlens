@@ -124,7 +124,11 @@ export async function POST(req: Request) {
 
       const answer = completion.choices[0]?.message?.content?.trim() || "No response from the model.";
 
-      await incrementAiUsage(user.id, user.email);
+      try {
+        await incrementAiUsage(user.id, user.email);
+      } catch (usageErr) {
+        console.error("AI usage increment failed (answer still returned):", usageErr);
+      }
 
       return NextResponse.json({
         answer,
@@ -142,6 +146,16 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "AI request timed out. Try a shorter question." }, { status: 504 });
     }
     console.error("Chat API error:", error);
-    return NextResponse.json({ error: "Failed to get an answer. Try again in a moment." }, { status: 500 });
+    const apiMessage =
+      error instanceof Error && "status" in error && typeof (error as { status?: number }).status === "number"
+        ? error.message
+        : error instanceof Error
+          ? error.message
+          : "Unknown error";
+    const hint =
+      /model|does not exist|deprecated|not found/i.test(apiMessage)
+        ? "AI model misconfigured on the server — check XAI_MODEL in Vercel."
+        : "Failed to get an answer. Try again in a moment.";
+    return NextResponse.json({ error: hint, detail: apiMessage.slice(0, 200) }, { status: 500 });
   }
 }
