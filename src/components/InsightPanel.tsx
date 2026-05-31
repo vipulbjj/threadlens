@@ -5,7 +5,7 @@ import { ChevronDown, Info } from "lucide-react";
 import type { ThreadInsight } from "@/lib/insights";
 
 const severityStyles: Record<ThreadInsight["severity"], string> = {
-  neutral: "border-zinc-800 bg-zinc-900/60",
+  neutral: "border-[var(--color-border)] bg-[var(--color-card)]",
   note: "border-amber-500/40 bg-amber-500/10",
   highlight: "border-emerald-500/40 bg-emerald-500/10",
 };
@@ -22,8 +22,8 @@ function InsightCard({ insight }: { insight: ThreadInsight }) {
       <div className="flex items-start gap-2">
         <span className={`mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full ${severityDot[insight.severity]}`} aria-hidden />
         <div className="min-w-0">
-          <p className="font-medium text-zinc-100 text-sm leading-snug">{insight.title}</p>
-          <p className="text-xs text-zinc-400 mt-0.5 leading-relaxed">{insight.detail}</p>
+          <p className="font-medium text-[var(--color-foreground)] text-sm leading-snug">{insight.title}</p>
+          <p className="text-xs text-[var(--color-muted-foreground)] mt-0.5 leading-relaxed">{insight.detail}</p>
         </div>
       </div>
     </div>
@@ -47,11 +47,11 @@ export function InsightPanel({
   const [showAll, setShowAll] = useState(extra.length <= 2);
 
   return (
-    <section className="rounded-2xl border border-zinc-800 bg-zinc-900/40 overflow-hidden">
-      <div className="flex items-center justify-between gap-3 px-4 py-3 border-b border-zinc-800/80">
+    <section className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] overflow-hidden">
+      <div className="flex items-center justify-between gap-3 px-4 py-3 border-b border-[var(--color-border)]">
         <div>
-          <h2 className="text-sm font-semibold text-zinc-100">{title}</h2>
-          <p className="text-xs text-zinc-500 mt-0.5">Computed on your device — not sent to AI</p>
+          <h2 className="text-sm font-semibold text-[var(--color-foreground)]">{title}</h2>
+          <p className="text-xs text-[var(--color-muted-foreground)] mt-0.5">Computed on your device — not sent to AI</p>
         </div>
         {extra.length > 2 && (
           <button
@@ -67,8 +67,8 @@ export function InsightPanel({
 
       <div className="p-4 space-y-3">
         {headline && (
-          <p className="text-sm text-zinc-300">
-            <span className="text-zinc-500">Overview · </span>
+          <p className="text-sm text-[var(--color-foreground)]">
+            <span className="text-[var(--color-muted-foreground)]">Overview · </span>
             {headline.detail}
           </p>
         )}
@@ -90,17 +90,17 @@ export function InsightPanel({
         )}
 
         {!showAll && extra.length > 0 && (
-          <p className="text-xs text-zinc-500">
+          <p className="text-xs text-[var(--color-muted-foreground)]">
             {extra.length} more signals hidden — expand to see repair language, tension markers, and more.
           </p>
         )}
       </div>
 
       {disclaimer && (
-        <aside className="flex gap-2.5 border-t border-zinc-800/80 bg-zinc-950/60 px-4 py-3 text-xs text-zinc-400 leading-relaxed">
+        <aside className="flex gap-2.5 border-t border-[var(--color-border)] bg-[var(--color-muted)]/40 px-4 py-3 text-xs text-[var(--color-muted-foreground)] leading-relaxed">
           <Info className="h-4 w-4 shrink-0 text-amber-400/90 mt-0.5" aria-hidden />
           <p>
-            <span className="font-medium text-zinc-300">Before you decide anything. </span>
+            <span className="font-medium text-[var(--color-foreground)]">Before you decide anything. </span>
             {disclaimer.detail.replace(/^Stats and AI reads[^.]*\.\s*/i, "")}
           </p>
         </aside>

@@ -4,6 +4,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { Send, BarChart3, ArrowLeft } from "lucide-react";
+import { ThemeToggle } from "@/components/ThemeProvider";
 import { useChatStore } from "@/lib/store";
 import { buildThreadInsights, buildFullThreadStats } from "@/lib/insights";
 import { getPromptsForUseCase } from "@/lib/prompts";
@@ -138,8 +139,8 @@ export default function ChatPage() {
   }
 
   return (
-    <div className="flex flex-col h-screen bg-zinc-950 text-zinc-100 pb-16 md:pb-0">
-      <header className="flex items-center gap-3 border-b border-zinc-800 px-4 py-3 shrink-0">
+    <div className="flex flex-col h-screen bg-[var(--color-background)] text-[var(--color-foreground)] pb-16 md:pb-0">
+      <header className="flex items-center gap-3 border-b border-[var(--color-border)] px-4 py-3 shrink-0">
         <Link href="/dashboard" className="text-zinc-400 hover:text-zinc-200" aria-label="Back">
           <ArrowLeft className="h-5 w-5" />
         </Link>
@@ -159,6 +160,7 @@ export default function ChatPage() {
         <Link href="/dashboard" className="text-zinc-400 hover:text-emerald-400" title="Dashboard stats">
           <BarChart3 className="h-5 w-5" />
         </Link>
+        <ThemeToggle />
         <UserMenu />
       </header>
 
@@ -169,13 +171,15 @@ export default function ChatPage() {
           <div
             key={i}
             className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
-              msg.role === "user" ? "ml-auto bg-emerald-600 text-white" : "mr-auto bg-zinc-800 text-zinc-100"
+              msg.role === "user"
+                ? "ml-auto bg-emerald-600 text-white"
+                : "mr-auto bg-[var(--color-secondary)] text-[var(--color-foreground)]"
             }`}
           >
             {renderMd(msg.content)}
           </div>
         ))}
-        {loading && <div className="text-sm text-zinc-500 animate-pulse">Thinking…</div>}
+        {loading && <div className="text-sm text-[var(--color-muted-foreground)] animate-pulse">Thinking…</div>}
         {quotaExceeded && <PremiumUpsell reason="quota" email={account?.email} />}
 
         {error && (
@@ -201,9 +205,9 @@ export default function ChatPage() {
         <div ref={bottomRef} />
       </main>
 
-      <footer className="shrink-0 border-t border-zinc-800 p-4 space-y-3">
+      <footer className="shrink-0 border-t border-[var(--color-border)] bg-[var(--color-background)] p-4 space-y-3">
         <div>
-          <p className="text-xs font-medium text-zinc-400 mb-2">Suggested questions</p>
+          <p className="text-xs font-medium text-[var(--color-muted-foreground)] mb-2">Suggested questions</p>
           <div className="flex flex-wrap gap-2">
             {prompts.map((p) => (
               <button
@@ -211,7 +215,7 @@ export default function ChatPage() {
                 type="button"
                 disabled={loading}
                 onClick={() => void ask(p.question)}
-                className="rounded-full border border-zinc-700 bg-zinc-900 px-3 py-1.5 text-xs text-zinc-300 hover:border-emerald-500/50 hover:text-emerald-200 disabled:opacity-50"
+                className="rounded-full border border-[var(--color-border)] bg-[var(--color-card)] px-3 py-1.5 text-xs text-[var(--color-muted-foreground)] hover:border-emerald-500/50 hover:text-emerald-600 dark:hover:text-emerald-200 disabled:opacity-50"
               >
                 {p.label}
               </button>
@@ -225,7 +229,7 @@ export default function ChatPage() {
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && void ask(input)}
             placeholder="Ask about this thread…"
-            className="flex-1 rounded-xl bg-zinc-900 border border-zinc-700 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+            className="flex-1 rounded-xl bg-[var(--color-input)] border border-[var(--color-border)] px-4 py-3 text-sm text-[var(--color-foreground)] placeholder:text-[var(--color-muted-foreground)] focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
             disabled={loading}
           />
           <button
@@ -239,13 +243,13 @@ export default function ChatPage() {
           </button>
         </div>
         <div className="mt-2 space-y-0.5">
-          <p className="text-[10px] text-zinc-400 text-center leading-snug">
+          <p className="text-[10px] text-[var(--color-muted-foreground)] text-center leading-snug">
             <span className="text-emerald-500/80">✓ Pattern stats</span>
             {" "}(reply speed, balance, tone) computed from{" "}
-            <span className="font-medium text-zinc-300">{session.messages.length.toLocaleString()} messages</span>
+            <span className="font-medium text-[var(--color-foreground)]">{session.messages.length.toLocaleString()} messages</span>
             {" "}— always included.
           </p>
-          <p className="text-[10px] text-zinc-500 text-center leading-snug">
+          <p className="text-[10px] text-[var(--color-muted-foreground)]/70 text-center leading-snug">
             Conversation text: last ~{account?.isPremium ? "500" : "350"} messages only
             {aiProvider ? ` · ${aiProvider}` : ""}
             {" "}· Not therapy or legal advice.
