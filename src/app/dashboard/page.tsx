@@ -1,9 +1,10 @@
 "use client";
 
+import { useMemo } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { MessageSquare, Upload, Trash2, BarChart3, User } from "lucide-react";
-import { useChatStore, useActiveSession } from "@/lib/store";
+import { useChatStore, useActiveSession, dedupeSessionsByName } from "@/lib/store";
 import { getChatStats } from "@/lib/parser";
 import { getUseCase } from "@/lib/use-cases";
 import { SiteFooter } from "@/components/SiteFooter";
@@ -13,19 +14,15 @@ import { useAccount } from "@/hooks/useAccount";
 export default function DashboardPage() {
   const router = useRouter();
   const { account } = useAccount();
-  // Deduplicate by name so that any legacy duplicates in localStorage don't show twice.
-  const sessions = useChatStore((s) => {
-    const seen = new Set<string>();
-    return s.sessions.filter((sess) => {
-      if (seen.has(sess.name)) return false;
-      seen.add(sess.name);
-      return true;
-    });
-  });
+  const rawSessions = useChatStore((s) => s.sessions);
+  const sessions = useMemo(() => dedupeSessionsByName(rawSessions), [rawSessions]);
   const removeSession = useChatStore((s) => s.removeSession);
   const active = useActiveSession();
 
-  const stats = active ? getChatStats(active.messages) : null;
+  const stats = useMemo(
+    () => (active?.messages?.length ? getChatStats(active.messages) : null),
+    [active]
+  );
 
   return (
     <div className="min-h-screen bg-[var(--color-background)] text-[var(--color-foreground)] p-6 pb-24">

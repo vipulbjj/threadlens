@@ -34,6 +34,16 @@ function newSessionId() {
   return `session-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
 }
 
+/** One session per export name — stable helper for useMemo (not inside a Zustand selector). */
+export function dedupeSessionsByName(sessions: ChatSession[]): ChatSession[] {
+  const seen = new Set<string>();
+  return sessions.filter((sess) => {
+    if (seen.has(sess.name)) return false;
+    seen.add(sess.name);
+    return true;
+  });
+}
+
 export const useChatStore = create<ChatStore>()(
   persist(
     (set, get) => ({
