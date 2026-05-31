@@ -3,7 +3,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import { Send, BarChart3, ArrowLeft } from "lucide-react";
+import { Send, ArrowLeft } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeProvider";
 import { useChatStore } from "@/lib/store";
 import { buildThreadInsights, buildFullThreadStats } from "@/lib/insights";
@@ -74,7 +74,7 @@ export default function ChatPage() {
     setChatHistory([
       {
         role: "assistant",
-        content: `Loaded **${session.name}** — ${session.messages.length.toLocaleString()} messages, lens: **${useCaseMeta.label}**.\n\nPattern stats (reply speed, who texts more, dismissive counts) are computed from your **full thread** and always included.\n\nFor conversation context, the AI reads recent messages as text — enough for tone and current themes. Tap a prompt or ask anything.`,
+        content: `Loaded **${session.name}** — ${session.messages.length.toLocaleString()} messages, lens: **${useCaseMeta.label}**.\n\nStats (reply speed, balance, dismissive counts) are computed from your full thread and always included.\n\nTap a prompt or ask anything.`,
       },
     ]);
   }, [session?.id, session?.messages.length, session?.name, useCaseMeta.label]);
@@ -153,13 +153,10 @@ export default function ChatPage() {
         <button
           type="button"
           onClick={() => setShowInsights((v) => !v)}
-          className="text-xs text-[var(--color-muted-foreground)] hover:text-emerald-400 px-2 py-1"
+          className="text-xs text-[var(--color-muted-foreground)] hover:text-emerald-400 px-2.5 py-1 rounded-md border border-[var(--color-border)] hover:border-emerald-400/40 transition-colors"
         >
-          {showInsights ? "Hide insights" : "Insights"}
+          {showInsights ? "Hide signals" : "Show signals"}
         </button>
-        <Link href="/dashboard" className="text-[var(--color-muted-foreground)] hover:text-emerald-400" title="Dashboard stats">
-          <BarChart3 className="h-5 w-5" />
-        </Link>
         <ThemeToggle />
         <UserMenu />
       </header>
@@ -170,10 +167,12 @@ export default function ChatPage() {
         {chatHistory.map((msg, i) => (
           <div
             key={i}
-            className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
+            className={`rounded-2xl px-4 py-3 text-sm leading-relaxed ${
               msg.role === "user"
-                ? "ml-auto bg-emerald-600 text-white"
-                : "mr-auto bg-[var(--color-secondary)] text-[var(--color-foreground)]"
+                ? "ml-auto max-w-[85%] bg-emerald-600 text-white"
+                : i === 0
+                  ? "mr-auto max-w-full border border-[var(--color-border)] bg-transparent text-[var(--color-muted-foreground)]"
+                  : "mr-auto max-w-[85%] bg-[var(--color-secondary)] text-[var(--color-foreground)]"
             }`}
           >
             {renderMd(msg.content)}
@@ -242,19 +241,9 @@ export default function ChatPage() {
             <Send className="h-5 w-5" />
           </button>
         </div>
-        <div className="mt-2 space-y-0.5">
-          <p className="text-[10px] text-[var(--color-muted-foreground)] text-center leading-snug">
-            <span className="text-emerald-500/80">✓ Pattern stats</span>
-            {" "}(reply speed, balance, tone) computed from{" "}
-            <span className="font-medium text-[var(--color-foreground)]">{session.messages.length.toLocaleString()} messages</span>
-            {" "}— always included.
-          </p>
-          <p className="text-[10px] text-[var(--color-muted-foreground)]/70 text-center leading-snug">
-            Conversation text: last ~{account?.isPremium ? "500" : "350"} messages only
-            {aiProvider ? ` · ${aiProvider}` : ""}
-            {" "}· Not therapy or legal advice.
-          </p>
-        </div>
+        <p className="mt-2 text-[10px] text-[var(--color-muted-foreground)]/60 text-center leading-snug">
+          Stats from all {session.messages.length.toLocaleString()} msgs · AI reads last ~{account?.isPremium ? "500" : "350"} · Not therapy
+        </p>
       </footer>
     </div>
   );
