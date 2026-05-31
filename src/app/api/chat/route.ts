@@ -54,6 +54,10 @@ export async function POST(req: Request) {
     const messages = body.messages;
     const question = typeof body.question === "string" ? body.question.trim() : "";
     const useCase = typeof body.useCase === "string" ? body.useCase : undefined;
+    const threadStats =
+      typeof body.threadStats === "string" && body.threadStats.trim()
+        ? body.threadStats.slice(0, 600)
+        : null;
 
     if (!messages || !Array.isArray(messages) || messages.length === 0) {
       return NextResponse.json({ error: "No chat messages provided." }, { status: 400 });
@@ -82,7 +86,7 @@ export async function POST(req: Request) {
     }
 
     const tier = tierFromPremium(account.isPremium);
-    const { context } = buildBoundedContext(messages, tier);
+    const bounded = buildBoundedContext(messages, tier);
 
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 55_000);
@@ -95,7 +99,15 @@ export async function POST(req: Request) {
             { role: "system", content: systemPromptForUseCase(useCase) },
             {
               role: "user",
-              content: `Chat transcript (recent messages):\n${context}\n\nQuestion: ${question}`,
+              content: [
+                threadStats
+                  ? `Thread-wide statistics (computed over all ${messages.length.toLocaleString()} messages — not just the excerpt below):\n${threadStats}`
+                  : null,
+                `Recent messages (last ~${bounded.messageCount} for conversational context):\n${bounded.context}`,
+                `Question: ${question}`,
+              ]
+                .filter(Boolean)
+                .join("\n\n"),
             },
           ],
           max_tokens: maxOutputTokens(tier),

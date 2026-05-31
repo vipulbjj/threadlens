@@ -5,7 +5,7 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import { Send, BarChart3, ArrowLeft } from "lucide-react";
 import { useChatStore } from "@/lib/store";
-import { buildThreadInsights } from "@/lib/insights";
+import { buildThreadInsights, buildFullThreadStats } from "@/lib/insights";
 import { getPromptsForUseCase } from "@/lib/prompts";
 import { getUseCase } from "@/lib/use-cases";
 import { InsightPanel } from "@/components/InsightPanel";
@@ -84,6 +84,7 @@ export default function ChatPage() {
           messages: session.messages,
           question: userMessage,
           useCase: session.useCase,
+          threadStats: buildFullThreadStats(session.messages),
         }),
       });
       const data = await res.json();
