@@ -63,7 +63,7 @@ export default function ChatPage() {
   const [error, setError] = useState<string | null>();
   const [aiProvider, setAiProvider] = useState<string | null>(null);
   const [quotaExceeded, setQuotaExceeded] = useState(false);
-  const { account, refresh: refreshAccount } = useAccount();
+  const { account, loading: accountLoading, refresh: refreshAccount } = useAccount();
   const bottomRef = useRef<HTMLDivElement>(null);
   const authRequired = isSupabaseConfigured();
 
@@ -94,7 +94,8 @@ export default function ChatPage() {
     setError(null);
     setQuotaExceeded(false);
 
-    if (authRequired && !account?.authenticated) {
+    // Only block on auth once we know the auth state — account is null while /api/me is loading
+    if (authRequired && !accountLoading && !account?.authenticated) {
       setError("Sign in to ask AI questions (30 free per day).");
       setLoading(false);
       return;
