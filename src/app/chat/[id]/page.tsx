@@ -178,7 +178,13 @@ export default function ChatPage() {
             {renderMd(msg.content)}
           </div>
         ))}
-        {loading && <div className="text-sm text-[var(--color-muted-foreground)] animate-pulse">Thinking…</div>}
+        {loading && (
+          <div className="mr-auto flex items-center gap-1.5 px-4 py-3 rounded-2xl bg-[var(--color-secondary)] w-fit">
+            <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-muted-foreground)] animate-[typing-dot_1.2s_ease-in-out_infinite]" style={{animationDelay:"0ms"}}/>
+            <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-muted-foreground)] animate-[typing-dot_1.2s_ease-in-out_infinite]" style={{animationDelay:"200ms"}}/>
+            <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-muted-foreground)] animate-[typing-dot_1.2s_ease-in-out_infinite]" style={{animationDelay:"400ms"}}/>
+          </div>
+        )}
         {quotaExceeded && <PremiumUpsell reason="quota" email={account?.email} />}
 
         {error && (
