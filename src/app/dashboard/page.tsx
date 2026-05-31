@@ -20,7 +20,7 @@ export default function DashboardPage() {
   const stats = active ? getChatStats(active.messages) : null;
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-100 p-6 pb-24">
+    <div className="min-h-screen bg-[var(--color-background)] text-[var(--color-foreground)] p-6 pb-24">
       <AppHeader
         title="Your threads"
         subtitle={
@@ -39,16 +39,16 @@ export default function DashboardPage() {
       </AppHeader>
 
       {account?.isPremium && (
-        <p className="max-w-4xl mx-auto -mt-4 mb-6 text-sm text-amber-200/90">
+        <p className="max-w-4xl mx-auto -mt-4 mb-6 text-sm text-amber-500 dark:text-amber-200/90">
           Premium active — full imports and a high daily AI limit.
         </p>
       )}
 
       {sessions.length === 0 ? (
-        <div className="max-w-md mx-auto text-center py-16 space-y-4 rounded-2xl border border-zinc-800 bg-zinc-900/40 p-8">
+        <div className="max-w-md mx-auto text-center py-16 space-y-4 rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-8">
           <MessageSquare className="h-12 w-12 text-emerald-400 mx-auto" />
           <h2 className="text-lg font-semibold">No chats yet</h2>
-          <p className="text-zinc-400 text-sm">
+          <p className="text-[var(--color-muted-foreground)] text-sm">
             Couples use it before hard talks. Friends use it to see who carries the group chat. Export a thread and drop
             the file.
           </p>
@@ -65,19 +65,19 @@ export default function DashboardPage() {
             return (
               <article
                 key={session.id}
-                className="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-5 hover:border-zinc-600 transition-colors flex flex-col"
+                className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-5 hover:border-[var(--color-ring)] transition-colors flex flex-col"
               >
                 <div className="flex items-start justify-between gap-2">
                   <div>
                     <h2 className="font-semibold truncate">{session.name}</h2>
-                    <p className="text-xs text-zinc-500 capitalize">
+                    <p className="text-xs text-[var(--color-muted-foreground)] capitalize">
                       {uc.emoji} {uc.label} · {session.platform}
                     </p>
                   </div>
                   <button
                     type="button"
                     onClick={() => removeSession(session.id)}
-                    className="text-zinc-500 hover:text-red-400 p-1"
+                    className="text-[var(--color-muted-foreground)] hover:text-red-400 p-1"
                     aria-label="Remove session"
                   >
                     <Trash2 className="h-4 w-4" />
@@ -85,18 +85,18 @@ export default function DashboardPage() {
                 </div>
                 <dl className="mt-4 grid grid-cols-2 gap-3 text-sm">
                   <div>
-                    <dt className="text-zinc-500">Messages</dt>
+                    <dt className="text-[var(--color-muted-foreground)]">Messages</dt>
                     <dd className="font-medium">{sessionStats.totalMessages.toLocaleString()}</dd>
                   </div>
                   <div>
-                    <dt className="text-zinc-500">Most active</dt>
+                    <dt className="text-[var(--color-muted-foreground)]">Most active</dt>
                     <dd className="font-medium truncate">{topSender?.sender ?? "—"}</dd>
                   </div>
                 </dl>
                 <button
                   type="button"
                   onClick={() => router.push(`/chat/${encodeURIComponent(session.id)}`)}
-                  className="mt-4 w-full rounded-lg bg-zinc-800 py-2 text-sm font-medium hover:bg-zinc-700 transition-colors"
+                  className="mt-4 w-full rounded-lg bg-[var(--color-secondary)] py-2 text-sm font-medium hover:bg-[var(--color-accent)] transition-colors text-[var(--color-secondary-foreground)]"
                 >
                   Open analysis
                 </button>
@@ -107,17 +107,17 @@ export default function DashboardPage() {
       )}
 
       {active && stats && (
-        <section className="max-w-4xl mx-auto mt-10 rounded-2xl border border-zinc-800 bg-zinc-900/40 p-6">
+        <section className="max-w-4xl mx-auto mt-10 rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-6">
           <h2 className="text-lg font-semibold flex items-center gap-2 mb-4">
             <BarChart3 className="h-5 w-5 text-emerald-400" />
             Snapshot: {active.name}
           </h2>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {stats.bySender.slice(0, 6).map((row) => (
-              <div key={row.sender} className="rounded-xl bg-zinc-950/80 p-4 border border-zinc-800">
+              <div key={row.sender} className="rounded-xl bg-[var(--color-background)] p-4 border border-[var(--color-border)]">
                 <p className="font-medium truncate">{row.sender}</p>
                 <p className="text-2xl font-bold text-emerald-400">{row.count}</p>
-                <p className="text-xs text-zinc-500">messages · avg {row.avgLength} chars</p>
+                <p className="text-xs text-[var(--color-muted-foreground)]">messages · avg {row.avgLength} chars</p>
                 {row.sorryCount > 0 && (
                   <p className="text-xs text-amber-400/90 mt-1">{row.sorryCount} sorry-style replies</p>
                 )}

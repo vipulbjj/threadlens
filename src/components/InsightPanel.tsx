@@ -11,7 +11,7 @@ const severityStyles: Record<ThreadInsight["severity"], string> = {
 };
 
 const severityDot: Record<ThreadInsight["severity"], string> = {
-  neutral: "bg-zinc-500",
+  neutral: "bg-[var(--color-muted-foreground)]",
   note: "bg-amber-400",
   highlight: "bg-emerald-400",
 };

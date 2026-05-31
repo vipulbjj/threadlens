@@ -23,14 +23,14 @@ export function UserMenu() {
   };
 
   if (loading) {
-    return <span className="text-xs text-zinc-500">…</span>;
+    return <span className="text-xs text-[var(--color-muted-foreground)]">…</span>;
   }
 
   if (!account?.authenticated) {
     return (
       <Link
         href="/login"
-        className="inline-flex items-center gap-1.5 rounded-full border border-zinc-700 px-3 py-1.5 text-xs font-medium text-zinc-300 hover:border-emerald-500/50 hover:text-emerald-200"
+        className="inline-flex items-center gap-1.5 rounded-full border border-[var(--color-border)] px-3 py-1.5 text-xs font-medium text-[var(--color-foreground)] hover:border-emerald-500/50 hover:text-emerald-500"
       >
         <LogIn className="h-3.5 w-3.5" />
         Sign in
@@ -46,15 +46,15 @@ export function UserMenu() {
           Premium
         </span>
       ) : (
-        <span className="text-[10px] text-zinc-500">
+        <span className="text-[10px] text-[var(--color-muted-foreground)]">
           AI {account.usage.aiQuestionsToday}/{account.usage.aiLimit < 0 ? "∞" : account.usage.aiLimit} today
         </span>
       )}
-      <Link href="/account" className="text-xs text-zinc-400 hover:text-zinc-200 truncate max-w-[8rem]" title={account.email}>
+      <Link href="/account" className="text-xs text-[var(--color-muted-foreground)] hover:text-[var(--color-foreground)] truncate max-w-[8rem]" title={account.email}>
         <User className="h-4 w-4 inline mr-1" />
         {account.email?.split("@")[0]}
       </Link>
-      <button type="button" onClick={() => void signOut()} className="text-zinc-500 hover:text-zinc-200 p-1" aria-label="Sign out">
+      <button type="button" onClick={() => void signOut()} className="text-[var(--color-muted-foreground)] hover:text-[var(--color-foreground)] p-1" aria-label="Sign out">
         <LogOut className="h-4 w-4" />
       </button>
     </div>

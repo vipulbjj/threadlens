@@ -18,7 +18,7 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
 
   if (!isSupabaseConfigured()) {
     return (
-      <div className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-6 text-sm text-zinc-400">
+      <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-card)] p-6 text-sm text-[var(--color-muted-foreground)]">
         Auth is not configured yet. Add <code className="text-emerald-400">NEXT_PUBLIC_SUPABASE_URL</code> and{" "}
         <code className="text-emerald-400">NEXT_PUBLIC_SUPABASE_ANON_KEY</code> to Vercel. You can still parse chats
         without signing in.
@@ -76,35 +76,35 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
   return (
     <div className="w-full max-w-md mx-auto space-y-6">
       <div className="text-center">
-        <h1 className="text-2xl font-bold text-white">{title}</h1>
-        <p className="text-sm text-zinc-400 mt-2">
+        <h1 className="text-2xl font-bold text-[var(--color-foreground)]">{title}</h1>
+        <p className="text-sm text-[var(--color-muted-foreground)] mt-2">
           {mode === "login" && "Free tier: 30 AI questions per day. Premium via email."}
           {mode === "signup" && "Parsing stays on your device. Sign in to use AI."}
           {mode === "forgot" && "We'll email you a link to set a new password."}
         </p>
       </div>
 
-      <form onSubmit={(e) => void submit(e)} className="space-y-4 rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6">
+      <form onSubmit={(e) => void submit(e)} className="space-y-4 rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-6">
         <label className="block text-sm">
-          <span className="text-zinc-400">Email</span>
+          <span className="text-[var(--color-muted-foreground)]">Email</span>
           <input
             type="email"
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="mt-1 w-full rounded-lg bg-zinc-950 border border-zinc-700 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
+            className="mt-1 w-full rounded-lg bg-[var(--color-background)] border border-[var(--color-border)] px-3 py-2.5 text-sm text-[var(--color-foreground)] focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
           />
         </label>
         {mode !== "forgot" && (
           <label className="block text-sm">
-            <span className="text-zinc-400">Password</span>
+            <span className="text-[var(--color-muted-foreground)]">Password</span>
             <input
               type="password"
               required
               minLength={8}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="mt-1 w-full rounded-lg bg-zinc-950 border border-zinc-700 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
+              className="mt-1 w-full rounded-lg bg-[var(--color-background)] border border-[var(--color-border)] px-3 py-2.5 text-sm text-[var(--color-foreground)] focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
             />
           </label>
         )}
@@ -119,7 +119,7 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
         </button>
       </form>
 
-      <p className="text-center text-xs text-zinc-500">
+      <p className="text-center text-xs text-[var(--color-muted-foreground)]">
         {mode === "login" && (
           <>
             <Link href="/signup" className="text-emerald-400 hover:underline">

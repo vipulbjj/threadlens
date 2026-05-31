@@ -92,20 +92,20 @@ export default function UploadPage() {
   const selectedUseCase = USE_CASES.find((u) => u.id === useCase);
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-100 flex flex-col items-center justify-center p-6 pb-24">
+    <div className="min-h-screen bg-[var(--color-background)] text-[var(--color-foreground)] flex flex-col items-center justify-center p-6 pb-24">
       <div className="w-full max-w-lg space-y-8">
         <div className="flex justify-end">
           <UserMenu />
         </div>
         <div className="text-center space-y-2">
           <h1 className="text-3xl font-bold tracking-tight">Drop your chat export</h1>
-          <p className="text-zinc-400 text-sm">
+          <p className="text-[var(--color-muted-foreground)] text-sm">
             Parsing stays on your device. Optional AI uses a free-tier model when configured on the server.
           </p>
         </div>
 
         <div>
-          <p className="text-xs font-medium text-zinc-500 uppercase tracking-wide mb-2">What are you analyzing?</p>
+          <p className="text-xs font-medium text-[var(--color-muted-foreground)] uppercase tracking-wide mb-2">What are you analyzing?</p>
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
             {USE_CASES.map((uc) => (
               <button
@@ -114,8 +114,8 @@ export default function UploadPage() {
                 onClick={() => setUseCase(uc.id)}
                 className={`rounded-xl border px-3 py-2.5 text-left text-sm transition-colors ${
                   useCase === uc.id
-                    ? "border-emerald-500 bg-emerald-500/15 text-emerald-100"
-                    : "border-zinc-800 bg-zinc-900/60 text-zinc-400 hover:border-zinc-600"
+                    ? "border-emerald-500 bg-emerald-500/15 text-emerald-700 dark:text-emerald-100"
+                    : "border-[var(--color-border)] bg-[var(--color-card)] text-[var(--color-muted-foreground)] hover:border-[var(--color-ring)]"
                 }`}
               >
                 <span className="mr-1">{uc.emoji}</span>
@@ -124,7 +124,7 @@ export default function UploadPage() {
             ))}
           </div>
           {selectedUseCase && (
-            <p className="mt-2 text-xs text-zinc-500 leading-relaxed">{selectedUseCase.tagline}</p>
+            <p className="mt-2 text-xs text-[var(--color-muted-foreground)] leading-relaxed">{selectedUseCase.tagline}</p>
           )}
         </div>
 
@@ -137,28 +137,28 @@ export default function UploadPage() {
               className={`min-h-11 px-4 py-2.5 rounded-full text-sm font-medium transition-colors ${
                 platform === p.id
                   ? "bg-emerald-500 text-zinc-950"
-                  : "bg-zinc-800 text-zinc-300 hover:bg-zinc-700"
+                  : "bg-[var(--color-secondary)] text-[var(--color-secondary-foreground)] hover:bg-[var(--color-accent)]"
               }`}
             >
               {p.label}
             </button>
           ))}
         </div>
-        <p className="text-center text-xs text-zinc-500">{PLATFORMS.find((p) => p.id === platform)?.hint}</p>
+        <p className="text-center text-xs text-[var(--color-muted-foreground)]">{PLATFORMS.find((p) => p.id === platform)?.hint}</p>
 
         <div
           {...getRootProps()}
           className={`min-h-[11rem] border-2 border-dashed rounded-2xl p-12 text-center cursor-pointer transition-colors flex flex-col items-center justify-center ${
-            isDragActive ? "border-emerald-400 bg-emerald-500/10" : "border-zinc-700 hover:border-zinc-500"
+            isDragActive ? "border-emerald-400 bg-emerald-500/10" : "border-[var(--color-border)] hover:border-[var(--color-ring)]"
           } ${loading ? "opacity-60 pointer-events-none" : ""}`}
         >
           <input {...getInputProps()} />
           <Upload className="mx-auto h-12 w-12 text-emerald-400 mb-4" />
           <p className="text-lg font-medium">{loading ? "Reading your file…" : "Drag & drop a .txt or .json file"}</p>
-          <p className="text-sm text-zinc-500 mt-2">
+          <p className="text-sm text-[var(--color-muted-foreground)] mt-2">
             Max {Math.round(limits.maxUploadBytes / (1024 * 1024))} MB · large files are parsed, then trimmed if needed
           </p>
-          <p className="text-xs text-zinc-600 mt-3">
+          <p className="text-xs text-[var(--color-muted-foreground)]/70 mt-3">
             Try the{" "}
             <button
               type="button"
@@ -198,15 +198,15 @@ export default function UploadPage() {
         {platform === "whatsapp" && <ExportGuide />}
 
         {platform !== "whatsapp" && (
-          <div className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-4 text-sm text-zinc-400 space-y-1.5">
-            <p className="font-medium text-zinc-200 flex items-center gap-2">
+          <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-card)] p-4 text-sm text-[var(--color-muted-foreground)] space-y-1.5">
+            <p className="font-medium text-[var(--color-foreground)] flex items-center gap-2">
               <Smartphone className="h-4 w-4" /> How to export
             </p>
             {platform === "telegram" && (
-              <p className="text-zinc-500">Desktop app → select chat → ⋮ → Export chat history → choose .txt or .json</p>
+              <p className="text-[var(--color-muted-foreground)]">Desktop app → select chat → ⋮ → Export chat history → choose .txt or .json</p>
             )}
             {platform === "imessage" && (
-              <p className="text-zinc-500">Copy the thread to Notes, or use a Mac export tool to save as .txt</p>
+              <p className="text-[var(--color-muted-foreground)]">Copy the thread to Notes, or use a Mac export tool to save as .txt</p>
             )}
           </div>
         )}

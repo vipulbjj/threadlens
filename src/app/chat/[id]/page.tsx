@@ -29,7 +29,7 @@ function renderMd(text: string): React.ReactNode {
       if (part.startsWith("*") && part.endsWith("*"))
         return <em key={pi}>{part.slice(1, -1)}</em>;
       if (part.startsWith("`") && part.endsWith("`"))
-        return <code key={pi} className="rounded bg-zinc-700/50 px-1 font-mono text-[11px]">{part.slice(1, -1)}</code>;
+        return <code key={pi} className="rounded bg-[var(--color-secondary)] px-1 font-mono text-[11px]">{part.slice(1, -1)}</code>;
       return part;
     });
     return (
@@ -129,8 +129,8 @@ export default function ChatPage() {
 
   if (!session) {
     return (
-      <div className="min-h-screen bg-zinc-950 text-zinc-100 flex flex-col items-center justify-center p-6">
-        <p className="text-zinc-400 mb-4">This chat is not on this device anymore.</p>
+      <div className="min-h-screen bg-[var(--color-background)] text-[var(--color-foreground)] flex flex-col items-center justify-center p-6">
+        <p className="text-[var(--color-muted-foreground)] mb-4">This chat is not on this device anymore.</p>
         <Link href="/dashboard" className="text-emerald-400 hover:underline">
           Back to dashboard
         </Link>
@@ -141,23 +141,23 @@ export default function ChatPage() {
   return (
     <div className="flex flex-col h-screen bg-[var(--color-background)] text-[var(--color-foreground)] pb-16 md:pb-0">
       <header className="flex items-center gap-3 border-b border-[var(--color-border)] px-4 py-3 shrink-0">
-        <Link href="/dashboard" className="text-zinc-400 hover:text-zinc-200" aria-label="Back">
+        <Link href="/dashboard" className="text-[var(--color-muted-foreground)] hover:text-[var(--color-foreground)]" aria-label="Back">
           <ArrowLeft className="h-5 w-5" />
         </Link>
         <div className="min-w-0 flex-1">
           <h1 className="font-semibold truncate">{session.name}</h1>
-          <p className="text-xs text-zinc-500 capitalize">
+          <p className="text-xs text-[var(--color-muted-foreground)] capitalize">
             {useCaseMeta.emoji} {useCaseMeta.label} · {session.platform} · {session.messages.length.toLocaleString()} msgs
           </p>
         </div>
         <button
           type="button"
           onClick={() => setShowInsights((v) => !v)}
-          className="text-xs text-zinc-500 hover:text-emerald-400 px-2 py-1"
+          className="text-xs text-[var(--color-muted-foreground)] hover:text-emerald-400 px-2 py-1"
         >
           {showInsights ? "Hide insights" : "Insights"}
         </button>
-        <Link href="/dashboard" className="text-zinc-400 hover:text-emerald-400" title="Dashboard stats">
+        <Link href="/dashboard" className="text-[var(--color-muted-foreground)] hover:text-emerald-400" title="Dashboard stats">
           <BarChart3 className="h-5 w-5" />
         </Link>
         <ThemeToggle />
@@ -190,12 +190,12 @@ export default function ChatPage() {
                 Sign in →
               </Link>
             )}
-            <p className="text-xs text-zinc-500 mt-2">You can still use thread insights above without AI.</p>
+            <p className="text-xs text-[var(--color-muted-foreground)] mt-2">You can still use thread insights above without AI.</p>
           </div>
         )}
 
         {authRequired && account?.authenticated && !account.isPremium && (
-          <p className="text-[10px] text-zinc-600 text-center">
+          <p className="text-[10px] text-[var(--color-muted-foreground)] text-center">
             Free AI: {account.usage.aiQuestionsToday}/{account.usage.aiLimit} today ·{" "}
             <Link href="/pricing" className="text-amber-500/80 hover:underline">
               Premium

@@ -46,8 +46,8 @@ export function PremiumUpsell({ reason = "general", email }: PremiumUpsellProps)
         <div className="space-y-3 flex-1">
           <div>
             <p className="font-semibold text-amber-100">ThreadLens Premium</p>
-            <p className="text-zinc-300 mt-1">{copy}</p>
-            <ul className="mt-2 text-xs text-zinc-400 space-y-1 list-disc list-inside">
+            <p className="text-[var(--color-foreground)] mt-1">{copy}</p>
+            <ul className="mt-2 text-xs text-[var(--color-muted-foreground)] space-y-1 list-disc list-inside">
               <li>Full chat import (no 35k message cap)</li>
               <li>Unlimited AI questions per day</li>
               <li>Deeper context window for answers</li>
@@ -67,7 +67,7 @@ export function PremiumUpsell({ reason = "general", email }: PremiumUpsellProps)
             </button>
             <a
               href={`mailto:${CONTACT_EMAIL}?subject=ThreadLens%20Premium`}
-              className="inline-flex items-center rounded-lg border border-zinc-600 px-4 py-2 text-xs text-zinc-300 hover:bg-zinc-800"
+              className="inline-flex items-center rounded-lg border border-[var(--color-border)] px-4 py-2 text-xs text-[var(--color-foreground)] hover:bg-[var(--color-secondary)]"
             >
               Email directly
             </a>

@@ -64,10 +64,10 @@ export function ExportGuide({ platform: forcedPlatform }: { platform?: Platform 
   }
 
   return (
-    <div className="rounded-xl border border-zinc-800 bg-zinc-900/50 overflow-hidden text-sm">
+    <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-card)] overflow-hidden text-sm">
       {/* Header */}
-      <div className="flex items-center justify-between gap-2 px-4 py-3 border-b border-zinc-800/80">
-        <p className="font-medium text-zinc-200 flex items-center gap-2">
+      <div className="flex items-center justify-between gap-2 px-4 py-3 border-b border-[var(--color-border)]">
+        <p className="font-medium text-[var(--color-foreground)] flex items-center gap-2">
           {isMobile ? <Smartphone className="h-4 w-4 text-emerald-400" /> : <Monitor className="h-4 w-4 text-emerald-400" />}
           How to export from WhatsApp
         </p>
@@ -81,7 +81,7 @@ export function ExportGuide({ platform: forcedPlatform }: { platform?: Platform 
               className={`rounded-full px-2.5 py-0.5 text-xs font-medium transition-colors ${
                 platform === p
                   ? "bg-emerald-500/20 text-emerald-300 ring-1 ring-emerald-500/40"
-                  : "text-zinc-500 hover:text-zinc-300"
+                  : "text-[var(--color-muted-foreground)] hover:text-[var(--color-foreground)]"
               }`}
             >
               {p === "ios" ? "iPhone" : p === "android" ? "Android" : "Desktop"}
@@ -98,8 +98,8 @@ export function ExportGuide({ platform: forcedPlatform }: { platform?: Platform 
               {i + 1}
             </span>
             <div className="min-w-0">
-              <p className="text-zinc-200 leading-snug">{step.label}</p>
-              {step.sub && <p className="text-zinc-500 text-xs mt-0.5">{step.sub}</p>}
+              <p className="text-[var(--color-foreground)] leading-snug">{step.label}</p>
+              {step.sub && <p className="text-[var(--color-muted-foreground)] text-xs mt-0.5">{step.sub}</p>}
             </div>
           </li>
         ))}
@@ -119,7 +119,7 @@ export function ExportGuide({ platform: forcedPlatform }: { platform?: Platform 
         <button
           type="button"
           onClick={copySteps}
-          className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-700 px-3 py-1.5 text-xs font-medium text-zinc-400 hover:text-zinc-200 hover:border-zinc-600 transition-colors"
+          className="inline-flex items-center gap-1.5 rounded-lg border border-[var(--color-border)] px-3 py-1.5 text-xs font-medium text-[var(--color-muted-foreground)] hover:text-[var(--color-foreground)] hover:border-[var(--color-ring)] transition-colors"
         >
           {copied ? <Check className="h-3.5 w-3.5 text-emerald-400" /> : <Copy className="h-3.5 w-3.5" />}
           {copied ? "Copied!" : "Copy steps"}

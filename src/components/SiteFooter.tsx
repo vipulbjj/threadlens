@@ -8,8 +8,8 @@ const CONTACT = {
 
 export function SiteFooter({ className = "" }: { className?: string }) {
   return (
-    <footer className={`border-t border-zinc-800 py-10 px-6 text-center text-sm text-zinc-500 ${className}`}>
-      <p className="text-zinc-400">
+    <footer className={`border-t border-[var(--color-border)] py-10 px-6 text-center text-sm text-[var(--color-muted-foreground)] ${className}`}>
+      <p className="text-[var(--color-foreground)]">
         ThreadLens is free — built for reflection, not therapy or legal advice.
       </p>
       <p className="mt-3">
@@ -18,32 +18,32 @@ export function SiteFooter({ className = "" }: { className?: string }) {
           Vipul Bajaj
         </a>
         {" · "}
-        <a href={CONTACT.linkedin} className="hover:text-zinc-300" target="_blank" rel="noopener noreferrer">
+        <a href={CONTACT.linkedin} className="hover:text-[var(--color-foreground)]" target="_blank" rel="noopener noreferrer">
           LinkedIn
         </a>
         {" · "}
-        <a href={CONTACT.x} className="hover:text-zinc-300" target="_blank" rel="noopener noreferrer">
+        <a href={CONTACT.x} className="hover:text-[var(--color-foreground)]" target="_blank" rel="noopener noreferrer">
           X
         </a>
       </p>
-      <p className="mt-4 text-xs text-zinc-600">
+      <p className="mt-4 text-xs text-[var(--color-muted-foreground)]">
         Feedback or collabs? Say hi via{" "}
-        <a href={CONTACT.site} className="text-zinc-500 hover:text-emerald-400/90">
+        <a href={CONTACT.site} className="text-[var(--color-muted-foreground)] hover:text-emerald-400/90">
           vipulbajaj.com
         </a>
         . Parsing stays in your browser; AI is optional.
       </p>
       <nav className="mt-6 flex flex-wrap justify-center gap-4 text-xs">
-        <Link href="/pricing" className="hover:text-zinc-300">
+        <Link href="/pricing" className="hover:text-[var(--color-foreground)]">
           Pricing
         </Link>
-        <Link href="/use-cases" className="hover:text-zinc-300">
+        <Link href="/use-cases" className="hover:text-[var(--color-foreground)]">
           Use cases
         </Link>
-        <Link href="/upload" className="hover:text-zinc-300">
+        <Link href="/upload" className="hover:text-[var(--color-foreground)]">
           Import
         </Link>
-        <Link href="/dashboard" className="hover:text-zinc-300">
+        <Link href="/dashboard" className="hover:text-[var(--color-foreground)]">
           Threads
         </Link>
       </nav>
