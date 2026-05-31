@@ -211,21 +211,18 @@ export default function ChatPage() {
       </main>
 
       <footer className="shrink-0 border-t border-[var(--color-border)] bg-[var(--color-background)] p-4 space-y-3">
-        <div>
-          <p className="text-xs font-medium text-[var(--color-muted-foreground)] mb-2">Suggested questions</p>
-          <div className="flex flex-wrap gap-2">
-            {prompts.map((p) => (
-              <button
-                key={p.id}
-                type="button"
-                disabled={loading}
-                onClick={() => void ask(p.question)}
-                className="rounded-full border border-[var(--color-border)] bg-[var(--color-card)] px-3 py-1.5 text-xs text-[var(--color-muted-foreground)] hover:border-emerald-500/50 hover:text-emerald-600 dark:hover:text-emerald-200 disabled:opacity-50"
-              >
-                {p.label}
-              </button>
-            ))}
-          </div>
+        <div className="flex flex-wrap gap-1.5">
+          {prompts.map((p) => (
+            <button
+              key={p.id}
+              type="button"
+              disabled={loading}
+              onClick={() => void ask(p.question)}
+              className="rounded-full border border-[var(--color-border)] bg-[var(--color-card)] px-3 py-1.5 text-xs text-[var(--color-foreground)]/70 transition-colors hover:border-emerald-500/60 hover:bg-emerald-500/8 hover:text-emerald-600 dark:hover:text-emerald-300 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              {p.label}
+            </button>
+          ))}
         </div>
         <div className="flex gap-2">
           <input
