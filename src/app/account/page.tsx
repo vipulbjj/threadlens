@@ -65,7 +65,7 @@ export default function AccountPage() {
           {account.isPremium ? (
             <p className="mt-3 inline-flex items-center gap-2 rounded-full border border-amber-500/40 bg-amber-500/15 px-3 py-1.5 text-sm font-medium text-amber-200">
               <Crown className="h-4 w-4" />
-              Premium active — full imports & unlimited AI
+              Premium active — full imports & high daily AI limit
             </p>
           ) : (
             <p className="mt-2 text-sm text-zinc-500">

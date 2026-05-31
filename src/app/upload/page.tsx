@@ -47,7 +47,7 @@ export default function UploadPage() {
           setNotice(
             account?.isPremium
               ? `Loaded the most recent ${messages.length.toLocaleString()} of ${originalCount.toLocaleString()} messages (browser safety cap).`
-              : `Loaded the most recent ${messages.length.toLocaleString()} of ${originalCount.toLocaleString()} messages. Free tier keeps 20k — Premium imports the full thread.`
+              : `Loaded the most recent ${messages.length.toLocaleString()} of ${originalCount.toLocaleString()} messages. Free tier keeps 35k — Premium imports the full thread.`
           );
         } else if (originalCount > 50_000) {
           setNotice(

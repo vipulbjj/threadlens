@@ -21,7 +21,7 @@ export default function PricingPage() {
             <h2 className="font-semibold text-lg">Free</h2>
             <ul className="mt-4 space-y-2 text-sm text-zinc-400">
               <li>Local parsing & insights</li>
-              <li>Last 20,000 messages per import (with warning)</li>
+              <li>Last 35,000 messages per import (with warning)</li>
               <li>30 AI questions per day (signed in)</li>
               <li>Up to 100 MB export files</li>
             </ul>

@@ -44,7 +44,7 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ## Auth & Premium
 
-See [docs/SUPABASE_SETUP.md](docs/SUPABASE_SETUP.md). Free tier: 20k message import cap (with warning), 30 AI questions/day, 100 MB uploads. Premium (email-enabled): full import, unlimited AI, very large exports.
+See [docs/SUPABASE_SETUP.md](docs/SUPABASE_SETUP.md). Free tier: 35k message import cap (with warning), 30 AI questions/day, 100 MB uploads. Premium (email-enabled): full import, unlimited AI, very large exports.
 
 ## Deploy (Vercel)
 

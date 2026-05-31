@@ -1,3 +1,4 @@
+import { premiumAiDailyCap } from "./ai-guard";
 import type { AccountTier } from "./tiers";
 import { getLimits } from "./tiers";
 
@@ -11,13 +12,12 @@ export interface UsageSnapshot {
 
 export function usageFromCounts(isPremium: boolean, aiQuestionsToday: number): UsageSnapshot {
   const tier: AccountTier = isPremium ? "premium" : "free";
-  const limit = getLimits(tier).maxAiQuestionsPerDay;
-  const unlimited = !Number.isFinite(limit);
+  const limit = isPremium ? premiumAiDailyCap() : getLimits("free").maxAiQuestionsPerDay;
   return {
     tier,
     aiQuestionsToday,
-    aiLimit: unlimited ? -1 : limit,
-    canAskAi: unlimited || aiQuestionsToday < limit,
+    aiLimit: limit,
+    canAskAi: aiQuestionsToday < limit,
     isPremium,
   };
 }

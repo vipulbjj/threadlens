@@ -40,7 +40,7 @@ export default function DashboardPage() {
 
       {account?.isPremium && (
         <p className="max-w-4xl mx-auto -mt-4 mb-6 text-sm text-amber-200/90">
-          Premium active — full imports and unlimited AI questions.
+          Premium active — full imports and a high daily AI limit.
         </p>
       )}
 

@@ -18,8 +18,8 @@ describe.runIf(RUN)("Downloads WhatsApp exports", () => {
       const stats = getChatStats(messages);
       expect(stats.senders.length).toBeGreaterThan(0);
       const { messages: capped, truncated } = capImportedMessages(messages);
-      expect(capped.length).toBeLessThanOrEqual(20_000);
-      if (messages.length > 20_000) expect(truncated).toBe(true);
+      expect(capped.length).toBeLessThanOrEqual(35_000);
+      if (messages.length > 35_000) expect(truncated).toBe(true);
     });
   }
 });

@@ -57,7 +57,7 @@ export async function incrementAiUsage(userId: string, email: string) {
   if (!admin) return;
 
   const account = await resolveAccount(userId, email);
-  if (account.isPremium) return;
+  if (!account.usage.canAskAi) return;
 
   const day = startOfUtcDay();
   const next = account.usage.aiQuestionsToday + 1;

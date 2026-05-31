@@ -48,7 +48,7 @@ export function PremiumUpsell({ reason = "general", email }: PremiumUpsellProps)
             <p className="font-semibold text-amber-100">ThreadLens Premium</p>
             <p className="text-zinc-300 mt-1">{copy}</p>
             <ul className="mt-2 text-xs text-zinc-400 space-y-1 list-disc list-inside">
-              <li>Full chat import (no 20k message cap)</li>
+              <li>Full chat import (no 35k message cap)</li>
               <li>Unlimited AI questions per day</li>
               <li>Deeper context window for answers</li>
               <li>Enabled manually by email — no card yet</li>

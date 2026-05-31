@@ -39,7 +39,7 @@ describe("parseUniversalChat", () => {
   });
 
   it("caps very large imports to the most recent messages", () => {
-    const big = Array.from({ length: 25_000 }, (_, i) => ({
+    const big = Array.from({ length: 40_000 }, (_, i) => ({
       date: "1/1/24",
       time: "10:00 AM",
       sender: "A",
@@ -47,8 +47,8 @@ describe("parseUniversalChat", () => {
     }));
     const { messages, truncated, originalCount } = capImportedMessages(big);
     expect(truncated).toBe(true);
-    expect(originalCount).toBe(25_000);
-    expect(messages).toHaveLength(20_000);
+    expect(originalCount).toBe(40_000);
+    expect(messages).toHaveLength(35_000);
     expect(messages[0].message).toBe("msg 5000");
   });
 });

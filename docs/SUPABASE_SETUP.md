@@ -34,11 +34,19 @@ Uses Supabase `resetPasswordForEmail` → link opens `/auth/callback` → user s
 
 | | Free | Premium |
 |---|------|---------|
-| Import cap | Last 20k messages | Full thread |
-| AI questions / day | 30 (signed in) | Unlimited |
+| Import cap | Last 35k messages | Full thread |
+| AI questions / day | 30 (signed in) | 150 default (`PREMIUM_AI_DAILY_CAP` on Vercel) |
+| AI context sent | Last 350 msgs, 280 chars each, ~28k chars | Last 500 msgs, ~48k chars |
 | Upload file size | 100 MB | ~512 MB (device RAM is the real limit) |
 
 Premium upload is not capped at 200 MB anymore — that was an arbitrary guardrail. Parsing runs in the browser, so very large `.txt` files depend on phone/laptop memory, not Supabase.
+
+### Public deploy — token abuse guards
+
+- `/api/chat` requires sign-in when Supabase + `XAI_API_KEY` are set.
+- Per-user daily caps: 30 (free), 150 premium default — set `PREMIUM_AI_DAILY_CAP=500` on Vercel if you need more for your own account.
+- Context to the model is capped (message count, per-message length, total characters) so one request cannot send a full 35k-message export to xAI.
+- Request body max 2 MB; `max_tokens` 500 (free) / 800 (premium) per answer.
 
 ## Cursor Supabase MCP
 
