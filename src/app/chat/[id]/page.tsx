@@ -84,7 +84,7 @@ export default function ChatPage() {
           messages: session.messages,
           question: userMessage,
           useCase: session.useCase,
-          threadStats: buildFullThreadStats(session.messages),
+          threadStats: buildFullThreadStats(session.messages, session.useCase),
         }),
       });
       const data = await res.json();
