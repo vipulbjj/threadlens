@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import { ChevronDown, Info } from "lucide-react";
 import type { ThreadInsight } from "@/lib/insights";
 
@@ -11,19 +11,29 @@ const severityStyles: Record<ThreadInsight["severity"], string> = {
 };
 
 const severityDot: Record<ThreadInsight["severity"], string> = {
-  neutral: "bg-[var(--color-muted-foreground)]",
+  neutral: "bg-[var(--color-muted-foreground)]/60",
   note: "bg-amber-400",
   highlight: "bg-emerald-400",
 };
+
+/** Bold numeric tokens (e.g. "138,993") inside a plain string */
+function boldNumbers(text: string): React.ReactNode {
+  const parts = text.split(/(\d[\d,]*(?:\.\d+)?%?)/);
+  return parts.map((part, i) =>
+    /^\d[\d,]*(?:\.\d+)?%?$/.test(part) ? (
+      <strong key={i} className="font-semibold text-[var(--color-foreground)]">{part}</strong>
+    ) : part
+  );
+}
 
 function InsightCard({ insight }: { insight: ThreadInsight }) {
   return (
     <div className={`rounded-xl border px-3 py-2.5 ${severityStyles[insight.severity]}`}>
       <div className="flex items-start gap-2">
-        <span className={`mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full ${severityDot[insight.severity]}`} aria-hidden />
+        <span className={`mt-[5px] h-2 w-2 shrink-0 rounded-full ${severityDot[insight.severity]}`} aria-hidden />
         <div className="min-w-0">
-          <p className="font-medium text-[var(--color-foreground)] text-sm leading-snug">{insight.title}</p>
-          <p className="text-xs text-[var(--color-muted-foreground)] mt-0.5 leading-relaxed">{insight.detail}</p>
+          <p className="font-medium text-[var(--color-foreground)] text-[13px] leading-snug">{insight.title}</p>
+          <p className="text-[12px] text-[var(--color-foreground)]/65 mt-0.5 leading-relaxed">{boldNumbers(insight.detail)}</p>
         </div>
       </div>
     </div>
@@ -67,9 +77,9 @@ export function InsightPanel({
 
       <div className="p-4 space-y-3">
         {headline && (
-          <p className="text-sm text-[var(--color-foreground)]">
-            <span className="text-[var(--color-muted-foreground)]">Overview · </span>
-            {headline.detail}
+          <p className="text-[13px] text-[var(--color-muted-foreground)]">
+            <span className="text-[10px] font-semibold uppercase tracking-widest text-[var(--color-muted-foreground)]/60 mr-1.5">Overview</span>
+            {boldNumbers(headline.detail)}
           </p>
         )}
 
@@ -90,9 +100,13 @@ export function InsightPanel({
         )}
 
         {!showAll && extra.length > 0 && (
-          <p className="text-xs text-[var(--color-muted-foreground)]">
-            {extra.length} more signals hidden — expand to see repair language, tension markers, and more.
-          </p>
+          <button
+            type="button"
+            onClick={() => setShowAll(true)}
+            className="text-[12px] text-[var(--color-muted-foreground)] hover:text-emerald-400 transition-colors text-left w-full"
+          >
+            +{extra.length} more signals — reply gaps, repair language, tension markers…
+          </button>
         )}
       </div>
 
