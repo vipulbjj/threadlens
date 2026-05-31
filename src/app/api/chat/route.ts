@@ -5,13 +5,19 @@ import {
   maxMessagesInChatBody,
   maxOutputTokens,
 } from "@/lib/ai-guard";
+import { mapChatApiError } from "@/lib/chat-api-errors";
 import { resolveAccount, incrementAiUsage } from "@/lib/account";
 import { createClient } from "@/lib/supabase/server";
 import { isSupabaseConfigured, premiumContactEmail } from "@/lib/supabase/config";
 import { tierFromPremium } from "@/lib/tiers";
 
+/** Vercel defaults to ~10s without this; large premium threads often need 20–45s for xAI. */
+export const maxDuration = 60;
+
 const MAX_QUESTION_CHARS = 2000;
 const MAX_BODY_BYTES = 2_000_000;
+/** Stay under maxDuration so Vercel does not kill the function mid-flight. */
+const AI_ABORT_MS = 58_000;
 
 export async function POST(req: Request) {
   try {
@@ -95,7 +101,7 @@ export async function POST(req: Request) {
     const bounded = buildBoundedContext(messages, tier);
 
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 55_000);
+    const timeout = setTimeout(() => controller.abort(), AI_ABORT_MS);
 
     try {
       const completion = await provider.client.chat.completions.create(
@@ -142,20 +148,8 @@ export async function POST(req: Request) {
       clearTimeout(timeout);
     }
   } catch (error) {
-    if (error instanceof Error && error.name === "AbortError") {
-      return NextResponse.json({ error: "AI request timed out. Try a shorter question." }, { status: 504 });
-    }
     console.error("Chat API error:", error);
-    const apiMessage =
-      error instanceof Error && "status" in error && typeof (error as { status?: number }).status === "number"
-        ? error.message
-        : error instanceof Error
-          ? error.message
-          : "Unknown error";
-    const hint =
-      /model|does not exist|deprecated|not found/i.test(apiMessage)
-        ? "AI model misconfigured on the server — check XAI_MODEL in Vercel."
-        : "Failed to get an answer. Try again in a moment.";
-    return NextResponse.json({ error: hint, detail: apiMessage.slice(0, 200) }, { status: 500 });
+    const { status, body } = mapChatApiError(error);
+    return NextResponse.json(body, { status });
   }
 }
