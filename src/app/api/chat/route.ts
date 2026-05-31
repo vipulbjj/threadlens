@@ -52,11 +52,17 @@ export async function POST(req: Request) {
 
     const body = await req.json();
     const messages = body.messages;
+    const totalMessageCount =
+      typeof body.totalMessageCount === "number" && body.totalMessageCount > 0
+        ? Math.floor(body.totalMessageCount)
+        : Array.isArray(messages)
+          ? messages.length
+          : 0;
     const question = typeof body.question === "string" ? body.question.trim() : "";
     const useCase = typeof body.useCase === "string" ? body.useCase : undefined;
     const threadStats =
       typeof body.threadStats === "string" && body.threadStats.trim()
-        ? body.threadStats.slice(0, 600)
+        ? body.threadStats.slice(0, 8_000)
         : null;
 
     if (!messages || !Array.isArray(messages) || messages.length === 0) {
@@ -101,7 +107,7 @@ export async function POST(req: Request) {
               role: "user",
               content: [
                 threadStats
-                  ? `Thread-wide statistics (computed over all ${messages.length.toLocaleString()} messages — not just the excerpt below):\n${threadStats}`
+                  ? `Thread-wide statistics (computed over all ${totalMessageCount.toLocaleString()} messages — not just the excerpt below):\n${threadStats}`
                   : null,
                 `Recent messages (last ~${bounded.messageCount} for conversational context):\n${bounded.context}`,
                 `Question: ${question}`,

@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
-import { ChevronDown, Info } from "lucide-react";
+import React from "react";
+import { Info } from "lucide-react";
 import type { ThreadInsight } from "@/lib/insights";
 
 const severityStyles: Record<ThreadInsight["severity"], string> = {
@@ -22,7 +22,9 @@ function boldNumbers(text: string): React.ReactNode {
   return parts.map((part, i) =>
     /^\d[\d,]*(?:\.\d+)?%?$/.test(part) ? (
       <strong key={i} className="font-semibold text-[var(--color-foreground)]">{part}</strong>
-    ) : part
+    ) : (
+      part
+    )
   );
 }
 
@@ -52,61 +54,31 @@ export function InsightPanel({
   const disclaimer = insights.find((i) => i.id === "disclaimer");
   const metrics = insights.filter((i) => i.id !== "disclaimer");
   const headline = metrics.find((i) => i.id === "volume");
-  const primary = metrics.filter((i) => i.id !== "volume").slice(0, 3);
-  const extra = metrics.filter((i) => i.id !== "volume").slice(3);
-  const [showAll, setShowAll] = useState(extra.length <= 2);
+  const cards = metrics.filter((i) => i.id !== "volume");
 
   return (
     <section className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] overflow-hidden">
-      <div className="flex items-center justify-between gap-3 px-4 py-3 border-b border-[var(--color-border)]">
-        <div>
-          <h2 className="text-sm font-semibold text-[var(--color-foreground)]">{title}</h2>
-          <p className="text-xs text-[var(--color-muted-foreground)] mt-0.5">Computed on your device — not sent to AI</p>
-        </div>
-        {extra.length > 2 && (
-          <button
-            type="button"
-            onClick={() => setShowAll((v) => !v)}
-            className="inline-flex items-center gap-1 text-xs text-emerald-400 hover:text-emerald-300 shrink-0"
-          >
-            {showAll ? "Show less" : `Show all (${metrics.length})`}
-            <ChevronDown className={`h-3.5 w-3.5 transition-transform ${showAll ? "rotate-180" : ""}`} />
-          </button>
-        )}
+      <div className="px-4 py-3 border-b border-[var(--color-border)]">
+        <h2 className="text-sm font-semibold text-[var(--color-foreground)]">{title}</h2>
+        <p className="text-xs text-[var(--color-muted-foreground)] mt-0.5">Computed on your device — not sent to AI</p>
       </div>
 
       <div className="p-4 space-y-3">
         {headline && (
           <p className="text-[13px] text-[var(--color-muted-foreground)]">
-            <span className="text-[10px] font-semibold uppercase tracking-widest text-[var(--color-muted-foreground)]/60 mr-1.5">Overview</span>
+            <span className="text-[10px] font-semibold uppercase tracking-widest text-[var(--color-muted-foreground)]/60 mr-1.5">
+              Overview
+            </span>
             {boldNumbers(headline.detail)}
           </p>
         )}
 
-        {primary.length > 0 && (
+        {cards.length > 0 && (
           <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-            {primary.map((insight) => (
+            {cards.map((insight) => (
               <InsightCard key={insight.id} insight={insight} />
             ))}
           </div>
-        )}
-
-        {showAll && extra.length > 0 && (
-          <div className="grid gap-2 sm:grid-cols-2">
-            {extra.map((insight) => (
-              <InsightCard key={insight.id} insight={insight} />
-            ))}
-          </div>
-        )}
-
-        {!showAll && extra.length > 0 && (
-          <button
-            type="button"
-            onClick={() => setShowAll(true)}
-            className="text-[12px] text-[var(--color-muted-foreground)] hover:text-emerald-400 transition-colors text-left w-full"
-          >
-            +{extra.length} more signals — reply gaps, repair language, tension markers…
-          </button>
         )}
       </div>
 

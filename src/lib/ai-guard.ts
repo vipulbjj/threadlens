@@ -22,6 +22,18 @@ export function maxMessagesInChatBody() {
   return MAX_MESSAGES_IN_BODY;
 }
 
+/** Only send recent messages in the API body — full thread stats travel separately. */
+export function sliceMessagesForAiPayload(
+  messages: { sender: string; message: string }[],
+  tier: AccountTier
+) {
+  const maxMsgs = getLimits(tier).maxContextMessages;
+  return messages.slice(-maxMsgs).map((m) => ({
+    sender: String(m.sender ?? "Unknown"),
+    message: String(m.message ?? ""),
+  }));
+}
+
 export function buildBoundedContext(
   messages: { sender: string; message: string }[],
   tier: AccountTier

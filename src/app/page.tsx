@@ -60,6 +60,9 @@ export default function Home() {
               Open saved threads
             </Link>
           </div>
+          <p className="mt-3 text-center text-sm text-[var(--color-muted-foreground)]">
+            No account needed to import — sign in later for AI questions.
+          </p>
         </section>
 
         <section className="py-12">

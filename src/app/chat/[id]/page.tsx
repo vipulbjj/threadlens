@@ -14,6 +14,8 @@ import { useAccount } from "@/hooks/useAccount";
 import { PremiumUpsell } from "@/components/PremiumUpsell";
 import { UserMenu } from "@/components/UserMenu";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
+import { sliceMessagesForAiPayload } from "@/lib/ai-guard";
+import { tierFromPremium, readCachedTier } from "@/lib/tiers";
 
 interface ChatTurn {
   role: "user" | "assistant";
@@ -99,11 +101,13 @@ export default function ChatPage() {
     }
 
     try {
+      const tier = account ? tierFromPremium(account.isPremium) : readCachedTier();
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          messages: session.messages,
+          messages: sliceMessagesForAiPayload(session.messages, tier),
+          totalMessageCount: session.messages.length,
           question: userMessage,
           useCase: session.useCase,
           threadStats: buildFullThreadStats(session.messages, session.useCase),
