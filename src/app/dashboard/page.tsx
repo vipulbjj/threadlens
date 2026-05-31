@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { MessageSquare, Upload, Trash2, BarChart3 } from "lucide-react";
+import { MessageSquare, Upload, Trash2, BarChart3, User } from "lucide-react";
 import { useChatStore, useActiveSession } from "@/lib/store";
 import { getChatStats } from "@/lib/parser";
 import { getUseCase } from "@/lib/use-cases";
@@ -116,16 +116,22 @@ export default function DashboardPage() {
 
       {active && stats && (
         <section className="max-w-4xl mx-auto mt-10 rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-6">
-          <h2 className="text-lg font-semibold flex items-center gap-2 mb-4">
-            <BarChart3 className="h-5 w-5 text-emerald-400" />
-            Snapshot: {active.name}
-          </h2>
+          <div className="mb-4">
+            <h2 className="text-lg font-semibold flex items-center gap-2">
+              <BarChart3 className="h-5 w-5 text-emerald-400" />
+              {active.name}
+            </h2>
+            <p className="text-xs text-[var(--color-muted-foreground)] mt-0.5">Messages sent by each participant</p>
+          </div>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {stats.bySender.slice(0, 6).map((row) => (
               <div key={row.sender} className="rounded-xl bg-[var(--color-background)] p-4 border border-[var(--color-border)]">
-                <p className="font-medium truncate">{row.sender}</p>
-                <p className="text-2xl font-bold text-emerald-400">{row.count}</p>
-                <p className="text-xs text-[var(--color-muted-foreground)]">messages · avg {row.avgLength} chars</p>
+                <div className="flex items-center gap-1.5 mb-1">
+                  <User className="h-3.5 w-3.5 text-[var(--color-muted-foreground)] shrink-0" />
+                  <p className="font-medium truncate text-sm">{row.sender}</p>
+                </div>
+                <p className="text-2xl font-bold text-emerald-400">{row.count.toLocaleString()}</p>
+                <p className="text-xs text-[var(--color-muted-foreground)]">messages sent · avg {row.avgLength} chars</p>
                 {row.sorryCount > 0 && (
                   <p className="text-xs text-amber-400/90 mt-1">{row.sorryCount} sorry-style replies</p>
                 )}
