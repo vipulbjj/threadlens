@@ -12,6 +12,7 @@ import { useAccount } from "@/hooks/useAccount";
 import { tierFromPremium, getLimits } from "@/lib/tiers";
 import { PremiumUpsell } from "@/components/PremiumUpsell";
 import { UserMenu } from "@/components/UserMenu";
+import { ExportGuide } from "@/components/ExportGuide";
 
 const PLATFORMS: { id: ChatPlatform; label: string; hint: string }[] = [
   { id: "whatsapp", label: "WhatsApp", hint: ".txt from Export chat" },
@@ -194,19 +195,25 @@ export default function UploadPage() {
           </div>
         )}
 
-        <div className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-4 text-sm text-zinc-400 space-y-2">
-          <p className="font-medium text-zinc-200 flex items-center gap-2">
-            <Smartphone className="h-4 w-4" /> How to export
-          </p>
-          <ul className="list-disc list-inside space-y-1 text-zinc-500">
-            <li>WhatsApp: Chat → ⋮ → Export chat → Without media → .txt</li>
-            <li>Telegram: Desktop app → Export chat history (.txt or .json)</li>
-            <li>iMessage: Copy thread to Notes or use a Mac export tool → .txt</li>
-          </ul>
-          <Link href="/use-cases" className="inline-block text-emerald-400/90 text-xs hover:underline mt-2">
-            See all use cases →
-          </Link>
-        </div>
+        {platform === "whatsapp" && <ExportGuide />}
+
+        {platform !== "whatsapp" && (
+          <div className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-4 text-sm text-zinc-400 space-y-1.5">
+            <p className="font-medium text-zinc-200 flex items-center gap-2">
+              <Smartphone className="h-4 w-4" /> How to export
+            </p>
+            {platform === "telegram" && (
+              <p className="text-zinc-500">Desktop app → select chat → ⋮ → Export chat history → choose .txt or .json</p>
+            )}
+            {platform === "imessage" && (
+              <p className="text-zinc-500">Copy the thread to Notes, or use a Mac export tool to save as .txt</p>
+            )}
+          </div>
+        )}
+
+        <Link href="/use-cases" className="block text-center text-emerald-400/80 text-xs hover:underline">
+          See all use cases →
+        </Link>
       </div>
     </div>
   );
