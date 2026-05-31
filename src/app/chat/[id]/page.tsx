@@ -52,7 +52,7 @@ export default function ChatPage() {
     setChatHistory([
       {
         role: "assistant",
-        content: `Loaded **${session.name}** (${session.messages.length.toLocaleString()} messages). Lens: **${useCaseMeta.label}**. Stats are on-device; tap a guided prompt below or ask your own question.`,
+        content: `Loaded **${session.name}** — ${session.messages.length.toLocaleString()} messages, lens: **${useCaseMeta.label}**.\n\nPattern stats (reply speed, who texts more, dismissive counts) are computed from your **full thread** and always included.\n\nFor conversation context, the AI reads recent messages as text — enough for tone and current themes. Tap a prompt or ask anything.`,
       },
     ]);
   }, [session?.id, session?.messages.length, session?.name, useCaseMeta.label]);
@@ -217,9 +217,19 @@ export default function ChatPage() {
             <Send className="h-5 w-5" />
           </button>
         </div>
-        <p className="text-[10px] text-zinc-500 mt-2 text-center">
-          Optional AI sends recent messages to the server{aiProvider ? ` (${aiProvider})` : ""}. Not therapy or legal advice.
-        </p>
+        <div className="mt-2 space-y-0.5">
+          <p className="text-[10px] text-zinc-400 text-center leading-snug">
+            <span className="text-emerald-500/80">✓ Pattern stats</span>
+            {" "}(reply speed, balance, tone) computed from{" "}
+            <span className="font-medium text-zinc-300">{session.messages.length.toLocaleString()} messages</span>
+            {" "}— always included.
+          </p>
+          <p className="text-[10px] text-zinc-500 text-center leading-snug">
+            Conversation text: last ~{account?.isPremium ? "500" : "350"} messages only
+            {aiProvider ? ` · ${aiProvider}` : ""}
+            {" "}· Not therapy or legal advice.
+          </p>
+        </div>
       </footer>
     </div>
   );

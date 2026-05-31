@@ -15,7 +15,7 @@ export const TIER_LIMITS = {
     maxPersistMessages: 80_000,
     /** Overridden at runtime by PREMIUM_AI_DAILY_CAP — not unlimited on public deploys. */
     maxAiQuestionsPerDay: 150,
-    maxContextMessages: 500,
+    maxContextMessages: 1_000,
     /** No artificial cap — large exports are limited by device RAM, not billing. */
     maxUploadBytes: 512 * 1024 * 1024,
   },

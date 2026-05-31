@@ -4,8 +4,8 @@ import { getLimits } from "./tiers";
 /** Hard caps on what we send to the LLM — main lever for public token spend. */
 const MAX_CHARS_PER_MESSAGE = 280;
 const MAX_CONTEXT_CHARS: Record<AccountTier, number> = {
-  free: 28_000,
-  premium: 48_000,
+  free: 28_000,   // ~7k tokens, last ~200-350 msgs depending on length
+  premium: 80_000, // ~20k tokens, last ~400-800 msgs depending on length
 };
 const MAX_MESSAGES_IN_BODY = 10_000;
 
