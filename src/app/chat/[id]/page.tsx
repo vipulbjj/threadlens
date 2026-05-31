@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { Send, BarChart3, ArrowLeft } from "lucide-react";
@@ -17,6 +17,27 @@ import { isSupabaseConfigured } from "@/lib/supabase/config";
 interface ChatTurn {
   role: "user" | "assistant";
   content: string;
+}
+
+function renderMd(text: string): React.ReactNode {
+  return text.split("\n").map((line, li, arr) => {
+    const parts = line.split(/(\*\*[^*]+\*\*|\*[^*]+\*|`[^`]+`)/);
+    const nodes = parts.map((part, pi) => {
+      if (part.startsWith("**") && part.endsWith("**"))
+        return <strong key={pi} className="font-semibold">{part.slice(2, -2)}</strong>;
+      if (part.startsWith("*") && part.endsWith("*"))
+        return <em key={pi}>{part.slice(1, -1)}</em>;
+      if (part.startsWith("`") && part.endsWith("`"))
+        return <code key={pi} className="rounded bg-zinc-700/50 px-1 font-mono text-[11px]">{part.slice(1, -1)}</code>;
+      return part;
+    });
+    return (
+      <span key={li}>
+        {nodes}
+        {li < arr.length - 1 && <br />}
+      </span>
+    );
+  });
 }
 
 export default function ChatPage() {
@@ -147,11 +168,11 @@ export default function ChatPage() {
         {chatHistory.map((msg, i) => (
           <div
             key={i}
-            className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed whitespace-pre-wrap ${
+            className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
               msg.role === "user" ? "ml-auto bg-emerald-600 text-white" : "mr-auto bg-zinc-800 text-zinc-100"
             }`}
           >
-            {msg.content}
+            {renderMd(msg.content)}
           </div>
         ))}
         {loading && <div className="text-sm text-zinc-500 animate-pulse">Thinking…</div>}
