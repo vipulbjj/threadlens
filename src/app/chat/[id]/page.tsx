@@ -74,7 +74,7 @@ export default function ChatPage() {
     setChatHistory([
       {
         role: "assistant",
-        content: `Loaded **${session.name}** — ${session.messages.length.toLocaleString()} messages, lens: **${useCaseMeta.label}**.\n\nStats (reply speed, balance, dismissive counts) are computed from your full thread and always included.\n\nTap a prompt or ask anything.`,
+        content: `Loaded **${session.name}** — ${session.messages.length.toLocaleString()} msgs, lens: **${useCaseMeta.label}**.\n\nPattern stats (reply speed, who texts more, dismissive counts) are computed from your **full thread** and always included. For conversation context, the AI reads recent messages as text — enough for tone and current themes.`,
       },
     ]);
   }, [session?.id, session?.messages.length, session?.name, useCaseMeta.label]);
