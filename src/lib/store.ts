@@ -67,7 +67,27 @@ export const useChatStore = create<ChatStore>()(
     }),
     {
       name: "threadlens-sessions",
-      storage: createJSONStorage(() => localStorage),
+      storage: createJSONStorage(() => ({
+        getItem: (key) => {
+          try {
+            return localStorage.getItem(key);
+          } catch {
+            return null;
+          }
+        },
+        setItem: (key, value) => {
+          try {
+            localStorage.setItem(key, value);
+          } catch {
+            // QuotaExceededError: session stays alive in memory for this tab session
+          }
+        },
+        removeItem: (key) => {
+          try {
+            localStorage.removeItem(key);
+          } catch {}
+        },
+      })),
       partialize: (state) => {
         const persistMax = persistMessageLimit(readCachedTier());
         return {

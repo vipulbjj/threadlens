@@ -12,7 +12,7 @@ export const TIER_LIMITS = {
   },
   premium: {
     maxImportMessages: Number.POSITIVE_INFINITY,
-    maxPersistMessages: 80_000,
+    maxPersistMessages: 40_000,
     /** Overridden at runtime by PREMIUM_AI_DAILY_CAP — not unlimited on public deploys. */
     maxAiQuestionsPerDay: 150,
     maxContextMessages: 1_000,
