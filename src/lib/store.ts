@@ -40,7 +40,10 @@ export const useChatStore = create<ChatStore>()(
       sessions: [],
       activeSessionId: null,
       setChat: (name, messages, platform, useCase) => {
-        const id = newSessionId();
+        // Reuse the existing id if a session with the same name already exists,
+        // so re-importing the same chat replaces it rather than duplicating it.
+        const existingId = get().sessions.find((s) => s.name === name)?.id;
+        const id = existingId ?? newSessionId();
         const session: ChatSession = {
           id,
           name,

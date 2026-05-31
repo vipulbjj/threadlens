@@ -13,7 +13,15 @@ import { useAccount } from "@/hooks/useAccount";
 export default function DashboardPage() {
   const router = useRouter();
   const { account } = useAccount();
-  const sessions = useChatStore((s) => s.sessions);
+  // Deduplicate by name so that any legacy duplicates in localStorage don't show twice.
+  const sessions = useChatStore((s) => {
+    const seen = new Set<string>();
+    return s.sessions.filter((sess) => {
+      if (seen.has(sess.name)) return false;
+      seen.add(sess.name);
+      return true;
+    });
+  });
   const removeSession = useChatStore((s) => s.removeSession);
   const active = useActiveSession();
 
