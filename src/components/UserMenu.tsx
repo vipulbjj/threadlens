@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { LogIn, LogOut, Crown, User } from "lucide-react";
+import { LogIn, LogOut, User } from "lucide-react";
+import { PremiumBadge } from "@/components/PremiumBadge";
 import { useAccount } from "@/hooks/useAccount";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { createClient } from "@/lib/supabase/client";
@@ -41,10 +42,7 @@ export function UserMenu() {
   return (
     <div className="flex items-center gap-2">
       {account.isPremium ? (
-        <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/20 border border-amber-500/40 px-2 py-0.5 text-[10px] font-semibold text-amber-200">
-          <Crown className="h-3 w-3" />
-          Premium
-        </span>
+        <PremiumBadge />
       ) : (
         <span className="text-[10px] text-[var(--color-muted-foreground)]">
           AI {account.usage.aiQuestionsToday}/{account.usage.aiLimit < 0 ? "∞" : account.usage.aiLimit} today

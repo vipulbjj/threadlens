@@ -40,12 +40,12 @@ export function PremiumUpsell({ reason = "general", email }: PremiumUpsellProps)
         : "Unlock the full thread and unlimited AI questions.";
 
   return (
-    <div className="rounded-2xl border border-amber-500/40 bg-amber-500/10 p-5 text-sm">
+    <div className="rounded-2xl border tl-warn-border tl-warn-bg p-5 text-sm">
       <div className="flex items-start gap-3">
-        <Crown className="h-5 w-5 text-amber-300 shrink-0 mt-0.5" />
+        <Crown className="h-5 w-5 tl-warn-icon shrink-0 mt-0.5" />
         <div className="space-y-3 flex-1">
           <div>
-            <p className="font-semibold text-amber-100">ThreadLens Premium</p>
+            <p className="font-semibold tl-warn-fg">ThreadLens Premium</p>
             <p className="text-[var(--color-foreground)] mt-1">{copy}</p>
             <ul className="mt-2 text-xs text-[var(--color-muted-foreground)] space-y-1 list-disc list-inside">
               <li>Full chat import (no 35k message cap)</li>
@@ -54,7 +54,7 @@ export function PremiumUpsell({ reason = "general", email }: PremiumUpsellProps)
               <li>Enabled manually by email — no card yet</li>
             </ul>
           </div>
-          {message && <p className="text-xs text-emerald-200/90">{message}</p>}
+          {message && <p className="text-xs text-emerald-800 dark:text-emerald-200/90">{message}</p>}
           <div className="flex flex-wrap gap-2">
             <button
               type="button"

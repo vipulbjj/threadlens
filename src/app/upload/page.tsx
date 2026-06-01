@@ -11,7 +11,7 @@ import { USE_CASES, type UseCaseId } from "@/lib/use-cases";
 import { useAccount } from "@/hooks/useAccount";
 import { tierFromPremium, getLimits } from "@/lib/tiers";
 import { PremiumUpsell } from "@/components/PremiumUpsell";
-import { UserMenu } from "@/components/UserMenu";
+import { SiteNavActions } from "@/components/SiteNavActions";
 import { ExportGuide } from "@/components/ExportGuide";
 
 const PLATFORMS: { id: ChatPlatform; label: string; hint: string }[] = [
@@ -92,13 +92,16 @@ export default function UploadPage() {
   const selectedUseCase = USE_CASES.find((u) => u.id === useCase);
 
   return (
-    <div className="min-h-screen bg-[var(--color-background)] text-[var(--color-foreground)] flex flex-col items-center justify-center p-6 pb-24">
+    <div className="min-h-screen bg-[var(--color-background)] text-[var(--color-foreground)] flex flex-col items-center justify-center px-4 py-6 pb-24 sm:p-6">
       <div className="w-full max-w-lg space-y-8">
-        <div className="flex justify-end">
-          <UserMenu />
+        <div className="flex items-center justify-between gap-3">
+          <Link href="/" className="text-sm font-medium text-[var(--color-muted-foreground)] hover:text-[var(--color-foreground)]">
+            ← Home
+          </Link>
+          <SiteNavActions />
         </div>
         <div className="text-center space-y-2">
-          <h1 className="text-3xl font-bold tracking-tight">Drop your chat export</h1>
+          <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">Drop your chat export</h1>
           <p className="text-[var(--color-muted-foreground)] text-sm">
             Parsing stays on your device. Optional AI uses a free-tier model when configured on the server.
           </p>
@@ -153,7 +156,7 @@ export default function UploadPage() {
           } ${loading ? "opacity-60 pointer-events-none" : ""}`}
         >
           <input {...getInputProps()} />
-          <Upload className="mx-auto h-12 w-12 text-emerald-400 mb-4" />
+          <Upload className="mx-auto h-12 w-12 tl-accent mb-4" />
           <p className="text-lg font-medium">{loading ? "Reading your file…" : "Drag & drop a .txt or .json file"}</p>
           <p className="text-sm text-[var(--color-muted-foreground)] mt-2">
             Max {Math.round(limits.maxUploadBytes / (1024 * 1024))} MB · large files are parsed, then trimmed if needed
@@ -179,7 +182,7 @@ export default function UploadPage() {
         </div>
 
         {notice && (
-          <div className="rounded-xl border border-amber-500/40 bg-amber-500/10 p-4 text-sm text-amber-100">
+          <div className="rounded-xl border tl-warn-border tl-warn-bg p-4 text-sm tl-warn-fg">
             {notice}
           </div>
         )}
@@ -189,7 +192,7 @@ export default function UploadPage() {
         )}
 
         {error && (
-          <div className="flex items-start gap-3 rounded-xl border border-red-500/40 bg-red-500/10 p-4 text-sm text-red-200">
+          <div className="flex items-start gap-3 rounded-xl border border-red-500/40 bg-red-500/10 p-4 text-sm text-red-900 dark:text-red-200">
             <AlertCircle className="h-5 w-5 shrink-0 mt-0.5" />
             <p>{error}</p>
           </div>
@@ -211,7 +214,7 @@ export default function UploadPage() {
           </div>
         )}
 
-        <Link href="/use-cases" className="block text-center text-emerald-400/80 text-xs hover:underline">
+        <Link href="/use-cases" className="block text-center text-emerald-700 dark:text-emerald-400/80 text-sm hover:underline sm:text-xs">
           See all use cases →
         </Link>
       </div>

@@ -68,7 +68,7 @@ export function ExportGuide({ platform: forcedPlatform }: { platform?: Platform 
       {/* Header */}
       <div className="flex items-center justify-between gap-2 px-4 py-3 border-b border-[var(--color-border)]">
         <p className="font-medium text-[var(--color-foreground)] flex items-center gap-2">
-          {isMobile ? <Smartphone className="h-4 w-4 text-emerald-400" /> : <Monitor className="h-4 w-4 text-emerald-400" />}
+          {isMobile ? <Smartphone className="h-4 w-4 tl-accent" /> : <Monitor className="h-4 w-4 tl-accent" />}
           How to export from WhatsApp
         </p>
         <div className="flex items-center gap-1.5">
@@ -80,7 +80,7 @@ export function ExportGuide({ platform: forcedPlatform }: { platform?: Platform 
               onClick={() => setPlatform(p)}
               className={`rounded-full px-2.5 py-0.5 text-xs font-medium transition-colors ${
                 platform === p
-                  ? "bg-emerald-500/20 text-emerald-300 ring-1 ring-emerald-500/40"
+                  ? "bg-emerald-500/20 text-emerald-900 ring-1 ring-emerald-600/35 dark:text-emerald-200"
                   : "text-[var(--color-muted-foreground)] hover:text-[var(--color-foreground)]"
               }`}
             >
@@ -94,7 +94,7 @@ export function ExportGuide({ platform: forcedPlatform }: { platform?: Platform 
       <ol className="px-4 py-3 space-y-2.5">
         {steps.map((step, i) => (
           <li key={i} className="flex gap-3 items-start">
-            <span className="mt-px flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-400 text-xs font-bold ring-1 ring-emerald-500/30">
+            <span className="mt-px flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-500/15 tl-accent text-xs font-bold ring-1 ring-emerald-500/30">
               {i + 1}
             </span>
             <div className="min-w-0">
@@ -121,7 +121,7 @@ export function ExportGuide({ platform: forcedPlatform }: { platform?: Platform 
           onClick={copySteps}
           className="inline-flex items-center gap-1.5 rounded-lg border border-[var(--color-border)] px-3 py-1.5 text-xs font-medium text-[var(--color-muted-foreground)] hover:text-[var(--color-foreground)] hover:border-[var(--color-ring)] transition-colors"
         >
-          {copied ? <Check className="h-3.5 w-3.5 text-emerald-400" /> : <Copy className="h-3.5 w-3.5" />}
+          {copied ? <Check className="h-3.5 w-3.5 tl-accent" /> : <Copy className="h-3.5 w-3.5" />}
           {copied ? "Copied!" : "Copy steps"}
         </button>
       </div>

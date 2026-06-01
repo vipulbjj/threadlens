@@ -19,8 +19,8 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
   if (!isSupabaseConfigured()) {
     return (
       <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-card)] p-6 text-sm text-[var(--color-muted-foreground)]">
-        Auth is not configured yet. Add <code className="text-emerald-400">NEXT_PUBLIC_SUPABASE_URL</code> and{" "}
-        <code className="text-emerald-400">NEXT_PUBLIC_SUPABASE_ANON_KEY</code> to Vercel. You can still parse chats
+        Auth is not configured yet. Add <code className="tl-accent">NEXT_PUBLIC_SUPABASE_URL</code> and{" "}
+        <code className="tl-accent">NEXT_PUBLIC_SUPABASE_ANON_KEY</code> to Vercel. You can still parse chats
         without signing in.
       </div>
     );
@@ -108,8 +108,8 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
             />
           </label>
         )}
-        {error && <p className="text-sm text-red-300">{error}</p>}
-        {info && <p className="text-sm text-emerald-300">{info}</p>}
+        {error && <p className="text-sm text-red-800 dark:text-red-300">{error}</p>}
+        {info && <p className="text-sm text-emerald-800 dark:text-emerald-300">{info}</p>}
         <button
           type="submit"
           disabled={loading}
@@ -122,22 +122,22 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
       <p className="text-center text-xs text-[var(--color-muted-foreground)]">
         {mode === "login" && (
           <>
-            <Link href="/signup" className="text-emerald-400 hover:underline">
+            <Link href="/signup" className="text-emerald-700 dark:text-emerald-400 hover:underline">
               Create account
             </Link>
             {" · "}
-            <Link href="/forgot-password" className="text-emerald-400 hover:underline">
+            <Link href="/forgot-password" className="text-emerald-700 dark:text-emerald-400 hover:underline">
               Forgot password?
             </Link>
           </>
         )}
         {mode === "signup" && (
-          <Link href="/login" className="text-emerald-400 hover:underline">
+          <Link href="/login" className="text-emerald-700 dark:text-emerald-400 hover:underline">
             Already have an account?
           </Link>
         )}
         {mode === "forgot" && (
-          <Link href="/login" className="text-emerald-400 hover:underline">
+          <Link href="/login" className="text-emerald-700 dark:text-emerald-400 hover:underline">
             Back to sign in
           </Link>
         )}

@@ -4,7 +4,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { Send, ArrowLeft } from "lucide-react";
-import { ThemeToggle } from "@/components/ThemeProvider";
+import { SiteNavActions } from "@/components/SiteNavActions";
 import { useChatStore } from "@/lib/store";
 import { buildThreadInsights, buildFullThreadStats } from "@/lib/insights";
 import { getPromptsForUseCase } from "@/lib/prompts";
@@ -12,7 +12,6 @@ import { getUseCase } from "@/lib/use-cases";
 import { InsightPanel } from "@/components/InsightPanel";
 import { useAccount } from "@/hooks/useAccount";
 import { PremiumUpsell } from "@/components/PremiumUpsell";
-import { UserMenu } from "@/components/UserMenu";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { sliceMessagesForAiPayload } from "@/lib/ai-guard";
 import { tierFromPremium, readCachedTier } from "@/lib/tiers";
@@ -140,7 +139,7 @@ export default function ChatPage() {
     return (
       <div className="min-h-screen bg-[var(--color-background)] text-[var(--color-foreground)] flex flex-col items-center justify-center p-6">
         <p className="text-[var(--color-muted-foreground)] mb-4">This chat is not on this device anymore.</p>
-        <Link href="/dashboard" className="text-emerald-400 hover:underline">
+        <Link href="/dashboard" className="tl-accent hover:underline">
           Back to dashboard
         </Link>
       </div>
@@ -149,25 +148,25 @@ export default function ChatPage() {
 
   return (
     <div className="flex flex-col h-screen bg-[var(--color-background)] text-[var(--color-foreground)] pb-16 md:pb-0">
-      <header className="flex items-center gap-3 border-b border-[var(--color-border)] px-4 py-3 shrink-0">
-        <Link href="/dashboard" className="text-[var(--color-muted-foreground)] hover:text-[var(--color-foreground)]" aria-label="Back">
+      <header className="flex items-center gap-2 border-b border-[var(--color-border)] px-3 py-2.5 shrink-0 sm:gap-3 sm:px-4 sm:py-3">
+        <Link href="/dashboard" className="text-[var(--color-muted-foreground)] hover:text-[var(--color-foreground)] shrink-0 p-1" aria-label="Back">
           <ArrowLeft className="h-5 w-5" />
         </Link>
         <div className="min-w-0 flex-1">
-          <h1 className="font-semibold truncate">{session.name}</h1>
-          <p className="text-xs text-[var(--color-muted-foreground)] capitalize">
-            {useCaseMeta.emoji} {useCaseMeta.label} · {session.platform} · {session.messages.length.toLocaleString()} msgs
+          <h1 className="font-semibold truncate text-sm sm:text-base">{session.name}</h1>
+          <p className="text-[11px] text-[var(--color-muted-foreground)] capitalize sm:text-xs">
+            {useCaseMeta.emoji} {useCaseMeta.label} · {session.messages.length.toLocaleString()} msgs
           </p>
         </div>
         <button
           type="button"
           onClick={() => setShowInsights((v) => !v)}
-          className="text-xs text-[var(--color-muted-foreground)] hover:text-emerald-400 px-2.5 py-1 rounded-md border border-[var(--color-border)] hover:border-emerald-400/40 transition-colors"
+          className="shrink-0 text-xs text-[var(--color-muted-foreground)] hover:text-emerald-700 dark:hover:text-emerald-400 min-h-10 px-2.5 py-2 rounded-md border border-[var(--color-border)] hover:border-emerald-500/40 transition-colors sm:px-2.5 sm:py-1"
         >
-          {showInsights ? "Hide signals" : "Show signals"}
+          <span className="hidden sm:inline">{showInsights ? "Hide signals" : "Signals"}</span>
+          <span className="sm:hidden">{showInsights ? "Hide" : "Stats"}</span>
         </button>
-        <ThemeToggle />
-        <UserMenu />
+        <SiteNavActions />
       </header>
 
       <main className="flex-1 overflow-y-auto p-4 space-y-4">
@@ -197,10 +196,10 @@ export default function ChatPage() {
         {quotaExceeded && <PremiumUpsell reason="quota" email={account?.email} />}
 
         {error && (
-          <div className="rounded-xl border border-red-500/40 bg-red-500/10 px-4 py-3 text-sm text-red-200">
+          <div className="rounded-xl border border-red-500/40 bg-red-500/10 px-4 py-3 text-sm text-red-900 dark:text-red-200">
             {error}
             {error.includes("Sign in") && (
-              <Link href="/login" className="block mt-2 text-emerald-400 text-xs hover:underline">
+              <Link href="/login" className="block mt-2 tl-accent text-xs hover:underline">
                 Sign in →
               </Link>
             )}
@@ -211,7 +210,7 @@ export default function ChatPage() {
         {authRequired && account?.authenticated && !account.isPremium && (
           <p className="text-[10px] text-[var(--color-muted-foreground)] text-center">
             Free AI: {account.usage.aiQuestionsToday}/{account.usage.aiLimit} today ·{" "}
-            <Link href="/pricing" className="text-amber-500/80 hover:underline">
+            <Link href="/pricing" className="tl-warn-muted hover:underline">
               Premium
             </Link>
           </p>
@@ -227,7 +226,7 @@ export default function ChatPage() {
               type="button"
               disabled={loading}
               onClick={() => void ask(p.question)}
-              className="rounded-full border border-[var(--color-border)] bg-[var(--color-card)] px-3 py-1.5 text-xs text-[var(--color-foreground)]/70 transition-colors hover:border-emerald-500/60 hover:bg-emerald-500/8 hover:text-emerald-600 dark:hover:text-emerald-300 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+              className="rounded-full border border-[var(--color-border)] bg-[var(--color-card)] px-3 py-2 text-xs text-[var(--color-foreground)]/80 transition-colors hover:border-emerald-500/60 hover:bg-emerald-500/8 hover:text-emerald-700 dark:hover:text-emerald-300 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed min-h-10 touch-manipulation"
             >
               {p.label}
             </button>

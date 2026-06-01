@@ -6,14 +6,14 @@ import type { ThreadInsight } from "@/lib/insights";
 
 const severityStyles: Record<ThreadInsight["severity"], string> = {
   neutral: "border-[var(--color-border)] bg-[var(--color-card)]",
-  note: "border-amber-500/40 bg-amber-500/10",
-  highlight: "border-emerald-500/40 bg-emerald-500/10",
+  note: "tl-warn-border tl-warn-bg",
+  highlight: "border-emerald-600/35 bg-emerald-500/12 dark:border-emerald-500/40 dark:bg-emerald-500/10",
 };
 
 const severityDot: Record<ThreadInsight["severity"], string> = {
   neutral: "bg-[var(--color-muted-foreground)]/60",
-  note: "bg-amber-400",
-  highlight: "bg-emerald-400",
+  note: "bg-[var(--tl-warn-icon)]",
+  highlight: "bg-emerald-700 dark:bg-emerald-400",
 };
 
 /** Bold numeric tokens (e.g. "138,993") inside a plain string */
@@ -34,8 +34,8 @@ function InsightCard({ insight }: { insight: ThreadInsight }) {
       <div className="flex items-start gap-2">
         <span className={`mt-[5px] h-2 w-2 shrink-0 rounded-full ${severityDot[insight.severity]}`} aria-hidden />
         <div className="min-w-0">
-          <p className="font-medium text-[var(--color-foreground)] text-[13px] leading-snug">{insight.title}</p>
-          <p className="text-[12px] text-[var(--color-foreground)]/65 mt-0.5 leading-relaxed">{boldNumbers(insight.detail)}</p>
+          <p className="font-medium text-[var(--color-foreground)] text-sm leading-snug">{insight.title}</p>
+          <p className="text-sm text-[var(--color-foreground)]/80 mt-0.5 leading-relaxed">{boldNumbers(insight.detail)}</p>
         </div>
       </div>
     </div>
@@ -59,8 +59,8 @@ export function InsightPanel({
   return (
     <section className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] overflow-hidden">
       <div className="px-4 py-3 border-b border-[var(--color-border)]">
-        <h2 className="text-sm font-semibold text-[var(--color-foreground)]">{title}</h2>
-        <p className="text-xs text-[var(--color-muted-foreground)] mt-0.5">Computed on your device — not sent to AI</p>
+        <h2 className="text-base font-semibold text-[var(--color-foreground)] sm:text-sm">{title}</h2>
+        <p className="text-sm text-[var(--color-muted-foreground)] mt-0.5 sm:text-xs">Computed on your device — not sent to AI</p>
       </div>
 
       <div className="p-4 space-y-3">
@@ -74,7 +74,7 @@ export function InsightPanel({
         )}
 
         {cards.length > 0 && (
-          <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-2.5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
             {cards.map((insight) => (
               <InsightCard key={insight.id} insight={insight} />
             ))}
@@ -83,8 +83,8 @@ export function InsightPanel({
       </div>
 
       {disclaimer && (
-        <aside className="flex gap-2.5 border-t border-[var(--color-border)] bg-[var(--color-muted)]/40 px-4 py-3 text-xs text-[var(--color-muted-foreground)] leading-relaxed">
-          <Info className="h-4 w-4 shrink-0 text-amber-400/90 mt-0.5" aria-hidden />
+        <aside className="flex gap-2.5 border-t border-[var(--color-border)] bg-[var(--color-muted)]/40 px-4 py-3.5 text-sm text-[var(--color-muted-foreground)] leading-relaxed sm:text-xs">
+          <Info className="h-4 w-4 shrink-0 tl-warn-icon mt-0.5" aria-hidden />
           <p>
             <span className="font-medium text-[var(--color-foreground)]">Before you decide anything. </span>
             {disclaimer.detail.replace(/^Stats and AI reads[^.]*\.\s*/i, "")}

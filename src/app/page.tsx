@@ -2,17 +2,17 @@ import Link from "next/link";
 import { ArrowRight, Shield, Sparkles, MessageCircle, Heart } from "lucide-react";
 import { USE_CASES } from "@/lib/use-cases";
 import { SiteFooter } from "@/components/SiteFooter";
-import { UserMenu } from "@/components/UserMenu";
+import { SiteNavActions } from "@/components/SiteNavActions";
 
 export default function Home() {
   return (
     <div className="min-h-screen bg-[var(--color-background)] text-[var(--color-foreground)] overflow-x-hidden">
-      <div className="pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,rgba(16,185,129,0.15),transparent_50%),radial-gradient(ellipse_60%_40%_at_80%_0%,rgba(59,130,246,0.08),transparent_50%)]" />
+      <div className="pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,rgba(16,185,129,0.15),transparent_50%),radial-gradient(ellipse_60%_40%_at_80%_0%,rgba(59,130,246,0.08),transparent_50%)] dark:opacity-100 opacity-80" />
 
-      <header className="relative z-10 mx-auto flex w-full max-w-5xl items-center justify-between px-6 py-6">
-        <span className="text-lg font-bold tracking-tight">ThreadLens</span>
-        <nav className="flex items-center gap-3 sm:gap-5 text-sm font-medium text-[var(--color-muted-foreground)]">
-          <UserMenu />
+      <header className="relative z-10 mx-auto flex w-full max-w-5xl items-center justify-between gap-3 px-4 py-4 sm:px-6 sm:py-6">
+        <span className="text-lg font-bold tracking-tight shrink-0">ThreadLens</span>
+        <nav className="flex flex-wrap items-center justify-end gap-2 sm:gap-4 text-sm font-medium text-[var(--color-muted-foreground)]">
+          <SiteNavActions showThemeLabel />
           <Link href="/use-cases" className="hover:text-[var(--color-foreground)] transition-colors hidden sm:inline">
             Use cases
           </Link>
@@ -31,13 +31,13 @@ export default function Home() {
 
       <main className="relative z-10 mx-auto max-w-5xl px-6 pb-24">
         <section className="pt-8 pb-16 text-center lg:pt-16">
-          <p className="mb-4 inline-flex items-center gap-2 rounded-full border border-rose-500/30 bg-rose-500/10 px-3 py-1 text-xs font-medium text-rose-400 dark:text-rose-200">
-            <Heart className="h-3 w-3" />
+          <p className="tl-trust-pill mb-4 inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-semibold">
+            <Heart className="h-3 w-3 shrink-0 opacity-90" aria-hidden />
             Free · private · built for real conversations
           </p>
           <h1 className="font-display text-4xl font-bold tracking-tight sm:text-6xl lg:text-7xl">
             Turn messy chats into{" "}
-            <span className="bg-gradient-to-r from-emerald-300 via-teal-200 to-sky-300 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-emerald-700 via-teal-700 to-sky-700 bg-clip-text text-transparent dark:from-emerald-300 dark:via-teal-200 dark:to-sky-300">
               calmer conversations
             </span>
           </h1>
@@ -81,7 +81,7 @@ export default function Home() {
             ))}
           </div>
           <p className="text-center mt-6">
-            <Link href="/use-cases" className="text-sm text-emerald-400 hover:underline">
+            <Link href="/use-cases" className="text-sm text-emerald-700 dark:text-emerald-400 hover:underline">
               Read all use cases →
             </Link>
           </p>
@@ -108,7 +108,7 @@ export default function Home() {
               },
             ].map((item) => (
               <li key={item.step} className="relative">
-                <span className="absolute -left-[2.35rem] top-0 text-xs font-bold tabular-nums text-emerald-400">
+                <span className="absolute -left-[2.35rem] top-0 text-xs font-bold tabular-nums tl-accent">
                   {item.step}
                 </span>
                 <h3 className="text-lg font-semibold">{item.title}</h3>
@@ -121,7 +121,7 @@ export default function Home() {
         <section className="py-16">
           <div className="rounded-3xl border border-[var(--color-border)] bg-[var(--color-card)] p-8 md:p-10 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
             <div className="flex items-start gap-4">
-              <Shield className="mt-1 h-6 w-6 shrink-0 text-emerald-400" aria-hidden />
+              <Shield className="mt-1 h-6 w-6 shrink-0 tl-accent" aria-hidden />
               <div>
                 <h3 className="text-lg font-semibold">Privacy, honestly</h3>
                 <p className="mt-2 text-sm text-[var(--color-muted-foreground)] max-w-xl">

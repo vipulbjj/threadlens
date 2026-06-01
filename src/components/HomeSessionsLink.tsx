@@ -7,7 +7,7 @@ export function HomeSessionsLink() {
   const count = useChatStore((s) => s.sessions.length);
   if (count === 0) return null;
   return (
-    <Link href="/dashboard" className="text-sm text-emerald-400 hover:underline">
+    <Link href="/dashboard" className="text-sm tl-accent hover:underline">
       View {count} saved thread{count === 1 ? "" : "s"}
     </Link>
   );

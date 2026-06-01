@@ -14,7 +14,7 @@ export function SiteFooter({ className = "" }: { className?: string }) {
       </p>
       <p className="mt-3">
         Built by{" "}
-        <a href={CONTACT.site} className="text-emerald-400 hover:underline" target="_blank" rel="noopener noreferrer">
+        <a href={CONTACT.site} className="tl-accent hover:underline" target="_blank" rel="noopener noreferrer">
           Vipul Bajaj
         </a>
         {" · "}
@@ -28,7 +28,7 @@ export function SiteFooter({ className = "" }: { className?: string }) {
       </p>
       <p className="mt-4 text-xs text-[var(--color-muted-foreground)]">
         Feedback or collabs? Say hi via{" "}
-        <a href={CONTACT.site} className="text-[var(--color-muted-foreground)] hover:text-emerald-400/90">
+        <a href={CONTACT.site} className="text-[var(--color-muted-foreground)] hover:text-emerald-700 dark:hover:text-emerald-400/90">
           vipulbajaj.com
         </a>
         . Parsing stays in your browser; AI is optional.

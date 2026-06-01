@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+/* Match ThemeProvider: `dark` / `light` on <html>, not prefers-color-scheme alone */
+@custom-variant dark (&:where(.dark, .dark *));
+@custom-variant light (&:where(.light, .light *));
+
 @theme {
   --font-sans: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-outfit), var(--font-dm-sans), ui-sans-serif, sans-serif;
@@ -61,6 +65,29 @@
   }
 }
 
+/* ── Dark mode tokens (explicit when .dark — e.g. after leaving light) ─── */
+html.dark {
+  --color-background: hsl(240 10% 3.9%);
+  --color-foreground: hsl(0 0% 98%);
+  --color-card: hsl(240 10% 3.9%);
+  --color-card-foreground: hsl(0 0% 98%);
+  --color-popover: hsl(240 10% 3.9%);
+  --color-popover-foreground: hsl(0 0% 98%);
+  --color-primary: hsl(0 0% 98%);
+  --color-primary-foreground: hsl(240 5.9% 10%);
+  --color-secondary: hsl(240 3.7% 15.9%);
+  --color-secondary-foreground: hsl(0 0% 98%);
+  --color-muted: hsl(240 3.7% 15.9%);
+  --color-muted-foreground: hsl(240 5% 64.9%);
+  --color-accent: hsl(240 3.7% 15.9%);
+  --color-accent-foreground: hsl(0 0% 98%);
+  --color-destructive: hsl(0 62.8% 30.6%);
+  --color-destructive-foreground: hsl(0 0% 98%);
+  --color-border: hsl(240 3.7% 15.9%);
+  --color-input: hsl(240 3.7% 15.9%);
+  --color-ring: hsl(142 71% 45%);
+}
+
 /* ── Light mode token overrides ─────────────────────────────────────────── */
 html.light {
   --color-background: hsl(0 0% 97%);
@@ -84,8 +111,59 @@ html.light {
   --color-ring: hsl(142 71% 38%);
 }
 
+/* Warning palette — not in @theme (Tailwind would generate conflicting `text-warning`). */
+html.dark {
+  --tl-warn-fg: hsl(43 96% 88%);
+  --tl-warn-muted: hsl(43 50% 72%);
+  --tl-warn-icon: hsl(43 90% 62%);
+  --tl-warn-border: hsl(43 55% 42% / 0.45);
+  --tl-warn-bg: hsl(43 45% 14% / 0.55);
+}
+
+html.light {
+  --tl-warn-fg: hsl(32 75% 16%);
+  --tl-warn-muted: hsl(32 60% 26%);
+  --tl-warn-icon: hsl(32 85% 32%);
+  --tl-warn-border: hsl(38 65% 38% / 0.4);
+  --tl-warn-bg: hsl(48 100% 92%);
+}
+
 html.light body {
   background-image: radial-gradient(circle at 50% -20%, rgba(16, 185, 129, 0.08), rgba(255,255,255,0));
+}
+
+@layer utilities {
+  .tl-warn-fg {
+    color: var(--tl-warn-fg);
+  }
+  .tl-warn-muted {
+    color: var(--tl-warn-muted);
+  }
+  .tl-warn-bg {
+    background-color: var(--tl-warn-bg);
+  }
+  .tl-warn-border {
+    border-color: var(--tl-warn-border);
+  }
+  .tl-warn-icon {
+    color: var(--tl-warn-icon);
+  }
+  .tl-accent {
+    color: hsl(161 94% 28%);
+  }
+  .dark .tl-accent {
+    color: hsl(160 84% 45%);
+  }
+  .tl-trust-pill {
+    border-color: hsl(350 65% 45% / 0.35);
+    background-color: hsl(350 100% 96%);
+    color: hsl(350 75% 22%);
+  }
+  .dark .tl-trust-pill {
+    border-color: hsl(350 50% 55% / 0.35);
+    background-color: hsl(350 45% 18% / 0.45);
+    color: hsl(350 90% 88%);
+  }
 }
 
 @keyframes typing-dot {

@@ -44,20 +44,20 @@ export default function DashboardPage() {
       </AppHeader>
 
       {account?.isPremium && (
-        <p className="max-w-4xl mx-auto -mt-4 mb-6 text-sm text-amber-500 dark:text-amber-200/90">
+        <p className="max-w-4xl mx-auto -mt-4 mb-6 text-sm tl-warn-fg">
           Premium active — full imports and a high daily AI limit.
         </p>
       )}
 
       {sessions.length === 0 ? (
         <div className="max-w-md mx-auto text-center py-16 space-y-4 rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-8">
-          <MessageSquare className="h-12 w-12 text-emerald-400 mx-auto" />
+          <MessageSquare className="h-12 w-12 tl-accent mx-auto" />
           <h2 className="text-lg font-semibold">No chats yet</h2>
           <p className="text-[var(--color-muted-foreground)] text-sm">
             Couples use it before hard talks. Friends use it to see who carries the group chat. Export a thread and drop
             the file.
           </p>
-          <Link href="/upload" className="inline-block text-emerald-400 font-medium hover:underline">
+          <Link href="/upload" className="inline-block text-emerald-700 dark:text-emerald-400 font-medium hover:underline">
             Go to upload
           </Link>
         </div>
@@ -115,7 +115,7 @@ export default function DashboardPage() {
         <section className="max-w-4xl mx-auto mt-10 rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-6">
           <div className="mb-4">
             <h2 className="text-lg font-semibold flex items-center gap-2">
-              <BarChart3 className="h-5 w-5 text-emerald-400" />
+              <BarChart3 className="h-5 w-5 tl-accent" />
               {active.name}
             </h2>
             <p className="text-xs text-[var(--color-muted-foreground)] mt-0.5">
@@ -131,10 +131,10 @@ export default function DashboardPage() {
                   <User className="h-3.5 w-3.5 text-[var(--color-muted-foreground)] shrink-0" />
                   <p className="font-medium truncate text-sm">{row.sender}</p>
                 </div>
-                <p className="text-2xl font-bold text-emerald-400">{row.count.toLocaleString()}</p>
+                <p className="text-2xl font-bold tl-accent">{row.count.toLocaleString()}</p>
                 <p className="text-xs text-[var(--color-muted-foreground)]">messages sent · avg {row.avgLength} chars</p>
                 {row.sorryCount > 0 && (
-                  <p className="text-xs text-amber-400/90 mt-1">{row.sorryCount} sorry-style replies</p>
+                  <p className="text-xs tl-warn-muted mt-1">{row.sorryCount} sorry-style replies</p>
                 )}
               </div>
             ))}
