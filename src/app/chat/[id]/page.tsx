@@ -12,6 +12,7 @@ import { getUseCase } from "@/lib/use-cases";
 import { InsightPanel } from "@/components/InsightPanel";
 import { useAccount } from "@/hooks/useAccount";
 import { PremiumUpsell } from "@/components/PremiumUpsell";
+import { AiQuotaHint } from "@/components/AiQuotaHint";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { sliceMessagesForAiPayload } from "@/lib/ai-guard";
 import { tierFromPremium, readCachedTier } from "@/lib/tiers";
@@ -56,7 +57,10 @@ export default function ChatPage() {
   const prompts = getPromptsForUseCase(session?.useCase);
 
   const [input, setInput] = useState("");
-  const [showInsights, setShowInsights] = useState(true);
+  /** Collapsed by default on phones so chat + sign-in stay in view (insights are long). */
+  const [showInsights, setShowInsights] = useState(() =>
+    typeof window !== "undefined" ? window.matchMedia("(min-width: 768px)").matches : true
+  );
   const [chatHistory, setChatHistory] = useState<ChatTurn[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>();
@@ -65,6 +69,7 @@ export default function ChatPage() {
   const { account, loading: accountLoading, refresh: refreshAccount } = useAccount();
   const bottomRef = useRef<HTMLDivElement>(null);
   const authRequired = isSupabaseConfigured();
+  const needsSignIn = authRequired && !accountLoading && !account?.authenticated;
 
   useEffect(() => {
     if (sessionId) setActiveSession(sessionId);
@@ -147,7 +152,7 @@ export default function ChatPage() {
   }
 
   return (
-    <div className="flex flex-col h-screen bg-[var(--color-background)] text-[var(--color-foreground)] pb-16 md:pb-0">
+    <div className="flex flex-col h-[100dvh] min-h-0 bg-[var(--color-background)] text-[var(--color-foreground)] pb-[calc(4rem+env(safe-area-inset-bottom))] md:pb-0">
       <header className="flex items-center gap-2 border-b border-[var(--color-border)] px-3 py-2.5 shrink-0 sm:gap-3 sm:px-4 sm:py-3">
         <Link href="/dashboard" className="text-[var(--color-muted-foreground)] hover:text-[var(--color-foreground)] shrink-0 p-1" aria-label="Back">
           <ArrowLeft className="h-5 w-5" />
@@ -169,8 +174,21 @@ export default function ChatPage() {
         <SiteNavActions />
       </header>
 
-      <main className="flex-1 overflow-y-auto p-4 space-y-4">
-        {showInsights && <InsightPanel insights={insights} />}
+      <main className="flex-1 min-h-0 overflow-y-auto p-4 space-y-4">
+        {showInsights ? (
+          <InsightPanel insights={insights} />
+        ) : (
+          <button
+            type="button"
+            onClick={() => setShowInsights(true)}
+            className="w-full rounded-xl border border-dashed border-[var(--color-border)] bg-[var(--color-card)] px-4 py-3 text-left text-sm text-[var(--color-muted-foreground)] hover:border-emerald-500/50 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors"
+          >
+            <span className="font-medium text-[var(--color-foreground)]">Thread insights</span>
+            <span className="block text-xs mt-0.5">
+              {insights.length} signals computed on your device — tap to expand
+            </span>
+          </button>
+        )}
 
         {chatHistory.map((msg, i) => (
           <div
@@ -193,7 +211,14 @@ export default function ChatPage() {
             <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-muted-foreground)] animate-[typing-dot_1.2s_ease-in-out_infinite]" style={{animationDelay:"400ms"}}/>
           </div>
         )}
-        {quotaExceeded && <PremiumUpsell reason="quota" email={account?.email} />}
+        {quotaExceeded && (
+          <PremiumUpsell
+            reason="quota"
+            email={account?.email}
+            aiUsedToday={account?.usage.aiQuestionsToday}
+            aiLimitToday={account?.usage.aiLimit}
+          />
+        )}
 
         {error && (
           <div className="rounded-xl border border-red-500/40 bg-red-500/10 px-4 py-3 text-sm text-red-900 dark:text-red-200">
@@ -207,24 +232,37 @@ export default function ChatPage() {
           </div>
         )}
 
-        {authRequired && account?.authenticated && !account.isPremium && (
-          <p className="text-[10px] text-[var(--color-muted-foreground)] text-center">
-            Free AI: {account.usage.aiQuestionsToday}/{account.usage.aiLimit} today ·{" "}
-            <Link href="/pricing" className="tl-warn-muted hover:underline">
-              Premium
-            </Link>
-          </p>
-        )}
         <div ref={bottomRef} />
       </main>
 
-      <footer className="shrink-0 border-t border-[var(--color-border)] bg-[var(--color-background)] p-4 space-y-3">
+      <footer className="shrink-0 border-t border-[var(--color-border)] bg-[var(--color-background)] p-4 space-y-3 pb-[max(1rem,env(safe-area-inset-bottom))] md:pb-4">
+        {account?.authenticated && !account.isPremium && (
+          <AiQuotaHint usage={account.usage} variant="footer" />
+        )}
+
+        {needsSignIn && (
+          <div className="rounded-xl border border-emerald-600/35 bg-emerald-500/10 px-4 py-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="min-w-0">
+              <p className="text-sm font-semibold text-[var(--color-foreground)]">Sign in to ask AI questions</p>
+              <p className="text-xs text-[var(--color-muted-foreground)] mt-0.5">
+                Stats above work offline · 30 free AI questions per day when signed in
+              </p>
+            </div>
+            <Link
+              href="/login"
+              className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-full bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-zinc-950 hover:bg-emerald-400 transition-colors"
+            >
+              Sign in free
+            </Link>
+          </div>
+        )}
+
         <div className="flex flex-wrap gap-1.5">
           {prompts.map((p) => (
             <button
               key={p.id}
               type="button"
-              disabled={loading}
+              disabled={loading || needsSignIn}
               onClick={() => void ask(p.question)}
               className="rounded-full border border-[var(--color-border)] bg-[var(--color-card)] px-3 py-2 text-xs text-[var(--color-foreground)]/80 transition-colors hover:border-emerald-500/60 hover:bg-emerald-500/8 hover:text-emerald-700 dark:hover:text-emerald-300 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed min-h-10 touch-manipulation"
             >
@@ -238,14 +276,14 @@ export default function ChatPage() {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && void ask(input)}
-            placeholder="Ask about this thread…"
+            placeholder={needsSignIn ? "Sign in above to ask AI…" : "Ask about this thread…"}
             className="flex-1 rounded-xl bg-[var(--color-input)] border border-[var(--color-border)] px-4 py-3 text-sm text-[var(--color-foreground)] placeholder:text-[var(--color-muted-foreground)] focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
-            disabled={loading}
+            disabled={loading || needsSignIn}
           />
           <button
             type="button"
             onClick={() => void ask(input)}
-            disabled={loading || !input.trim()}
+            disabled={loading || needsSignIn || !input.trim()}
             className="rounded-xl bg-emerald-500 px-4 py-3 text-zinc-950 font-semibold hover:bg-emerald-400 disabled:opacity-50 transition-colors"
             aria-label="Send"
           >

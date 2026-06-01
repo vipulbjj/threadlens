@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { LogIn, LogOut, User } from "lucide-react";
 import { PremiumBadge } from "@/components/PremiumBadge";
 import { useAccount } from "@/hooks/useAccount";
+import { formatAiQuotaCompact, formatAiQuotaTitle } from "@/lib/usage-copy";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { createClient } from "@/lib/supabase/client";
 
@@ -31,9 +32,9 @@ export function UserMenu() {
     return (
       <Link
         href="/login"
-        className="inline-flex items-center gap-1.5 rounded-full border border-[var(--color-border)] px-3 py-1.5 text-xs font-medium text-[var(--color-foreground)] hover:border-emerald-500/50 hover:text-emerald-500"
+        className="inline-flex min-h-10 items-center gap-1.5 rounded-full border border-emerald-600/40 bg-emerald-500/10 px-3 py-2 text-xs font-semibold text-emerald-800 dark:text-emerald-200 hover:border-emerald-500/60 hover:bg-emerald-500/15"
       >
-        <LogIn className="h-3.5 w-3.5" />
+        <LogIn className="h-4 w-4 shrink-0" aria-hidden />
         Sign in
       </Link>
     );
@@ -44,8 +45,11 @@ export function UserMenu() {
       {account.isPremium ? (
         <PremiumBadge />
       ) : (
-        <span className="text-[10px] text-[var(--color-muted-foreground)]">
-          AI {account.usage.aiQuestionsToday}/{account.usage.aiLimit < 0 ? "∞" : account.usage.aiLimit} today
+        <span
+          className="max-w-[9rem] truncate text-[10px] font-medium leading-tight text-[var(--color-muted-foreground)] sm:max-w-[11rem]"
+          title={formatAiQuotaTitle(account.usage.aiQuestionsToday, account.usage.aiLimit)}
+        >
+          {formatAiQuotaCompact(account.usage.aiQuestionsToday, account.usage.aiLimit)}
         </span>
       )}
       <Link href="/account" className="text-xs text-[var(--color-muted-foreground)] hover:text-[var(--color-foreground)] truncate max-w-[8rem]" title={account.email}>

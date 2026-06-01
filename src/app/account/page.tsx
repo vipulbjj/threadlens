@@ -10,6 +10,7 @@ import { PremiumBadge } from "@/components/PremiumBadge";
 import { useAccount } from "@/hooks/useAccount";
 import { createClient } from "@/lib/supabase/client";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
+import { formatAiQuotaDetail } from "@/lib/usage-copy";
 
 export default function AccountPage() {
   const { account, loading, refresh } = useAccount();
@@ -73,7 +74,7 @@ export default function AccountPage() {
             </div>
           ) : (
             <p className="mt-2 text-sm text-[var(--color-muted-foreground)]">
-              Free plan · {account.usage.aiQuestionsToday} / {account.usage.aiLimit} AI questions used today
+              {formatAiQuotaDetail(account.usage.aiQuestionsToday, account.usage.aiLimit)}
             </p>
           )}
         </div>

@@ -7,9 +7,12 @@ const CONTACT_EMAIL = process.env.NEXT_PUBLIC_PREMIUM_CONTACT_EMAIL || "hello@vi
 interface PremiumUpsellProps {
   reason?: "quota" | "import" | "general";
   email?: string;
+  /** Shown when reason is quota — e.g. 30/30 used today */
+  aiUsedToday?: number;
+  aiLimitToday?: number;
 }
 
-export function PremiumUpsell({ reason = "general", email }: PremiumUpsellProps) {
+export function PremiumUpsell({ reason = "general", email, aiUsedToday, aiLimitToday }: PremiumUpsellProps) {
   const [status, setStatus] = useState<"idle" | "sending" | "done" | "error">("idle");
   const [message, setMessage] = useState<string | null>(null);
 
@@ -34,7 +37,9 @@ export function PremiumUpsell({ reason = "general", email }: PremiumUpsellProps)
 
   const copy =
     reason === "quota"
-      ? "You've hit today's free AI question limit."
+      ? typeof aiUsedToday === "number" && typeof aiLimitToday === "number" && aiLimitToday > 0
+        ? `You've used all ${aiLimitToday} free AI questions for today (${aiUsedToday}/${aiLimitToday}). Your allowance resets at midnight UTC.`
+        : "You've hit today's free AI question limit (30 per day). Your allowance resets at midnight UTC."
       : reason === "import"
         ? "This export is larger than the free tier keeps in memory."
         : "Unlock the full thread and unlimited AI questions.";
