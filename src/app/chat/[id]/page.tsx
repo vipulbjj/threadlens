@@ -120,7 +120,10 @@ export default function ChatPage() {
         if (data.code === "quota_exceeded") {
           setQuotaExceeded(true);
         }
-        throw new Error(data.error || "Chat request failed");
+        const parts = [data.error || "Chat request failed"];
+        if (typeof data.code === "string" && data.code) parts.push(`[${data.code}]`);
+        if (typeof data.detail === "string" && data.detail.trim()) parts.push(data.detail);
+        throw new Error(parts.join(" — "));
       }
       if (data.provider) setAiProvider(data.provider);
       setChatHistory((prev) => [...prev, { role: "assistant", content: data.answer }]);

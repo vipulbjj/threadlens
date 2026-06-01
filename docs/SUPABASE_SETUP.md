@@ -48,6 +48,24 @@ Premium upload is not capped at 200 MB anymore — that was an arbitrary guardra
 - Context to the model is capped (message count, per-message length, total characters) so one request cannot send a full 35k-message export to xAI.
 - Request body max 2 MB; `max_tokens` 500 (free) / 800 (premium) per answer.
 
+## AI debugging (xAI / Vercel)
+
+If chat shows **503** with `[xai_auth]` or “Bad credentials”:
+
+1. **Verify the key locally** (never commits the key):
+   ```bash
+   npm run verify:xai
+   ```
+   Loads `XAI_API_KEY` from `.env`, `.env.local`, or `.env.production.local`.
+
+2. **Fix on Vercel:** [console.x.ai](https://console.x.ai/) → new API key (grant model + chat permissions) → Vercel → **Settings → Environment Variables** → update `XAI_API_KEY` for **Production** → redeploy.
+
+3. **Probe production while signed in** (browser DevTools console on threadlens.vercel.app):
+   ```js
+   fetch("/api/ai-health", { credentials: "include" }).then((r) => r.json()).then(console.log);
+   ```
+   Returns `{ ok, provider, model, code, detail }` without exposing the API key.
+
 ## Cursor Supabase MCP
 
 If the agent should create the project for you: complete **Supabase MCP** auth when Cursor prompts (Settings → MCP → Supabase → authenticate). Until that finishes, only `mcp_auth` is available and dashboard automation is blocked.

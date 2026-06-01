@@ -28,4 +28,12 @@ describe("mapChatApiError", () => {
     const { status } = mapChatApiError(new Error("FUNCTION_INVOCATION_TIMEOUT"));
     expect(status).toBe(504);
   });
+
+  it("maps 401 to xai_auth with detail", () => {
+    const err = new OpenAI.APIError(401, undefined, '401 "Bad credentials"', undefined);
+    const { status, body } = mapChatApiError(err);
+    expect(status).toBe(503);
+    expect(body.code).toBe("xai_auth");
+    expect(body.detail).toMatch(/Bad credentials/i);
+  });
 });

@@ -148,8 +148,13 @@ export async function POST(req: Request) {
       clearTimeout(timeout);
     }
   } catch (error) {
-    console.error("Chat API error:", error);
     const { status, body } = mapChatApiError(error);
+    console.error("Chat API error:", {
+      status,
+      code: body.code,
+      detail: body.detail,
+      provider: process.env.XAI_API_KEY ? "xAI" : process.env.GROQ_API_KEY ? "Groq" : "none",
+    });
     return NextResponse.json(body, { status });
   }
 }
