@@ -6,6 +6,7 @@ import { Upload, Smartphone, AlertCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { capImportedMessages, parseUniversalChat, ParseError } from "@/lib/parser";
+import { isAcceptedUploadFile, readChatExportFile } from "@/lib/read-upload-file";
 import { useChatStore, type ChatPlatform } from "@/lib/store";
 import { USE_CASES, type UseCaseId } from "@/lib/use-cases";
 import { useAccount } from "@/hooks/useAccount";
@@ -15,7 +16,7 @@ import { SiteNavActions } from "@/components/SiteNavActions";
 import { ExportGuide } from "@/components/ExportGuide";
 
 const PLATFORMS: { id: ChatPlatform; label: string; hint: string }[] = [
-  { id: "whatsapp", label: "WhatsApp", hint: ".txt from Export chat" },
+  { id: "whatsapp", label: "WhatsApp", hint: ".txt or .zip from Export chat" },
   { id: "telegram", label: "Telegram", hint: ".txt or .json export" },
   { id: "imessage", label: "iMessage", hint: ".txt thread export" },
 ];
@@ -38,7 +39,7 @@ export default function UploadPage() {
       setNotice(null);
       setLoading(true);
       try {
-        const text = await file.text();
+        const { text, displayName } = await readChatExportFile(file, limits.maxUploadBytes);
         const parsed = parseUniversalChat(text, platform);
         if (parsed.length === 0) {
           throw new ParseError("No messages found in that file.");
@@ -55,8 +56,7 @@ export default function UploadPage() {
             `Parsed ${originalCount.toLocaleString()} messages in your browser. Very large threads may feel slow on older devices.`
           );
         }
-        const name = file.name.replace(/\.[^.]+$/, "") || "Imported chat";
-        const sessionId = setChat(name, messages, platform, useCase);
+        const sessionId = setChat(displayName, messages, platform, useCase);
         router.push(`/chat/${encodeURIComponent(sessionId)}`);
       } catch (err) {
         const message = err instanceof ParseError ? err.message : "Could not read that file. Try another export.";
@@ -78,13 +78,27 @@ export default function UploadPage() {
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
-    accept: { "text/plain": [".txt"], "application/json": [".json"] },
+    accept: {
+      "text/plain": [".txt"],
+      "application/json": [".json"],
+      "application/zip": [".zip"],
+      "application/x-zip-compressed": [".zip"],
+    },
+    validator: (file) => (isAcceptedUploadFile(file) ? null : { code: "file-invalid-type", message: "Use .txt, .json, or .zip" }),
     maxFiles: 1,
     maxSize: limits.maxUploadBytes,
-    onDropRejected: () => {
-      setError(
-        `File is too large for the ${tier} tier (max ${Math.round(limits.maxUploadBytes / (1024 * 1024))} MB). Premium supports much larger exports if your device can handle them.`
-      );
+    onDropRejected: (rejections) => {
+      const tooLarge = rejections.some((r) => r.errors.some((e) => e.code === "file-too-large"));
+      const badType = rejections.some((r) => r.errors.some((e) => e.code === "file-invalid-type"));
+      if (tooLarge) {
+        setError(
+          `File is too large for the ${tier} tier (max ${Math.round(limits.maxUploadBytes / (1024 * 1024))} MB). Premium supports much larger exports if your device can handle them.`
+        );
+      } else if (badType) {
+        setError("Upload a .txt, .json, or .zip export (phone downloads are often a ZIP).");
+      } else {
+        setError("Could not accept that file. Try a chat export in .txt, .json, or .zip format.");
+      }
     },
     disabled: loading,
   });
@@ -157,7 +171,8 @@ export default function UploadPage() {
         >
           <input {...getInputProps()} />
           <Upload className="mx-auto h-12 w-12 tl-accent mb-4" />
-          <p className="text-lg font-medium">{loading ? "Reading your file…" : "Drag & drop a .txt or .json file"}</p>
+          <p className="text-lg font-medium">{loading ? "Reading your file…" : "Drag & drop a .txt, .json, or .zip"}</p>
+          <p className="text-sm text-[var(--color-muted-foreground)] mt-1">iPhone often saves exports as a ZIP — that works too</p>
           <p className="text-sm text-[var(--color-muted-foreground)] mt-2">
             Max {Math.round(limits.maxUploadBytes / (1024 * 1024))} MB · large files are parsed, then trimmed if needed
           </p>

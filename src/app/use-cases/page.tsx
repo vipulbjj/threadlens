@@ -31,7 +31,7 @@ export default function UseCasesPage() {
         ))}
 
         <div className="rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-6 text-center">
-          <p className="text-sm text-[var(--color-foreground)]/90">Ready? Export a chat without media, then drop the .txt file.</p>
+          <p className="text-sm text-[var(--color-foreground)]/90">Ready? Export a chat without media, then drop the .txt or .zip file.</p>
           <Link
             href="/upload"
             className="mt-4 inline-flex items-center gap-2 rounded-xl bg-emerald-500 px-6 py-3 text-sm font-semibold text-zinc-950 hover:bg-emerald-400 min-h-11 touch-manipulation"

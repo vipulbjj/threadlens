@@ -11,7 +11,7 @@ const STEPS: Record<Platform, { label: string; sub?: string }[]> = {
     { label: "Tap the contact or group name at the top" },
     { label: "Scroll down → tap Export Chat" },
     { label: "Choose Without Media" },
-    { label: "Save to Files (or Notes/Mail)", sub: "Then come back and drop the .txt here" },
+    { label: "Save to Files (or Notes/Mail)", sub: "Upload the .zip or .txt here — iPhone often gives you a ZIP" },
   ],
   android: [
     { label: "Open the chat in WhatsApp" },
@@ -31,7 +31,7 @@ const STEPS: Record<Platform, { label: string; sub?: string }[]> = {
 };
 
 const STEP_TEXT: Record<Platform, string> = {
-  ios: "1. Open chat\n2. Tap contact name\n3. Scroll → Export Chat\n4. Without Media\n5. Save to Files → upload here",
+  ios: "1. Open chat\n2. Tap contact name\n3. Scroll → Export Chat\n4. Without Media\n5. Save to Files → upload the .zip or .txt here",
   android: "1. Open chat\n2. ⋮ → More → Export chat\n3. Without Media\n4. Save .txt → upload here",
   desktop:
     "1. On phone: open chat\n2. iOS: tap name → Export Chat  |  Android: ⋮ → More → Export chat\n3. Without Media\n4. Send .txt to yourself → upload here",
