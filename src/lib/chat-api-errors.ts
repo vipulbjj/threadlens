@@ -49,11 +49,12 @@ export function mapChatApiError(error: unknown): { status: number; body: ChatApi
         },
       };
     }
-    if (error.status === 404 || /model|does not exist|deprecated|not found/i.test(detail)) {
+    if (error.status === 404 || /model|deployment|does not exist|deprecated|not found/i.test(detail)) {
       return {
         status: 503,
         body: {
-          error: "AI model misconfigured on the server — check XAI_MODEL in Vercel.",
+          error:
+            "AI model or deployment misconfigured — check AZURE_OPENAI_DEPLOYMENT or XAI_MODEL in Vercel.",
           detail,
           code: "xai_model",
         },

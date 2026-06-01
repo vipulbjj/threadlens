@@ -9,7 +9,8 @@
     "lint": "next lint",
     "test": "vitest run",
     "test:watch": "vitest",
-    "verify:xai": "node scripts/verify-xai-key.mjs"
+    "verify:xai": "node scripts/verify-xai-key.mjs",
+    "verify:azure": "node scripts/verify-azure-openai.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.5.0",

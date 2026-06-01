@@ -29,7 +29,10 @@ export async function POST(req: Request) {
     const provider = resolveAiProvider();
     if (!provider) {
       return NextResponse.json(
-        { error: "AI is not configured on the server. Add XAI_API_KEY in Vercel env." },
+        {
+          error:
+            "AI is not configured on the server. Add AZURE_OPENAI_* or XAI_API_KEY in Vercel (see docs/AZURE_OPENAI_SETUP.md).",
+        },
         { status: 503 }
       );
     }
@@ -153,7 +156,14 @@ export async function POST(req: Request) {
       status,
       code: body.code,
       detail: body.detail,
-      provider: process.env.XAI_API_KEY ? "xAI" : process.env.GROQ_API_KEY ? "Groq" : "none",
+      provider:
+        process.env.AZURE_OPENAI_API_KEY && process.env.AZURE_OPENAI_ENDPOINT
+          ? "Azure"
+          : process.env.XAI_API_KEY
+            ? "xAI"
+            : process.env.GROQ_API_KEY
+              ? "Groq"
+              : "none",
     });
     return NextResponse.json(body, { status });
   }

@@ -22,7 +22,7 @@ export async function probeAiProvider(): Promise<AiProbeResult> {
       model: null,
       ok: false,
       code: "ai_not_configured",
-      error: "No XAI_API_KEY or GROQ_API_KEY on the server.",
+      error: "No AZURE_OPENAI_*, XAI_API_KEY, or GROQ_API_KEY on the server.",
     };
   }
 

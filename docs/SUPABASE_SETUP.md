@@ -14,7 +14,10 @@
 | `NEXT_PUBLIC_SUPABASE_URL` | Project Settings → API |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Project Settings → API |
 | `SUPABASE_SERVICE_ROLE_KEY` | Project Settings → API (server only, never expose to client) |
-| `XAI_API_KEY` | xAI console (primary AI) |
+| `AZURE_OPENAI_API_KEY` | Azure Portal → openclaw-openai-svc01 → Keys (see [AZURE_OPENAI_SETUP.md](./AZURE_OPENAI_SETUP.md)) |
+| `AZURE_OPENAI_ENDPOINT` | Same page, e.g. `https://openclaw-openai-svc01.openai.azure.com` |
+| `AZURE_OPENAI_DEPLOYMENT` | Model deployment name, e.g. `gpt-4o-mini` |
+| `XAI_API_KEY` | Optional fallback if Azure unset |
 | `PREMIUM_EMAILS` | Comma-separated emails to auto-enable premium, e.g. `vbajaj56@gmail.com` |
 | `PREMIUM_CONTACT_EMAIL` | Inbox for premium requests (also set `NEXT_PUBLIC_PREMIUM_CONTACT_EMAIL` for client mailto links) |
 
@@ -48,7 +51,11 @@ Premium upload is not capped at 200 MB anymore — that was an arbitrary guardra
 - Context to the model is capped (message count, per-message length, total characters) so one request cannot send a full 35k-message export to xAI.
 - Request body max 2 MB; `max_tokens` 500 (free) / 800 (premium) per answer.
 
-## AI debugging (xAI / Vercel)
+## AI provider
+
+Production prefers **Azure OpenAI** when `AZURE_OPENAI_*` is set. Full key + deployment steps: **[AZURE_OPENAI_SETUP.md](./AZURE_OPENAI_SETUP.md)**.
+
+## AI debugging (Azure / xAI / Vercel)
 
 If chat shows **503** with `[xai_auth]` or “Bad credentials”:
 

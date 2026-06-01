@@ -48,7 +48,7 @@ See [docs/SUPABASE_SETUP.md](docs/SUPABASE_SETUP.md). Free tier: 35k message imp
 
 ## Deploy (Vercel)
 
-1. Set **`XAI_API_KEY`** (primary AI).
+1. Set **`AZURE_OPENAI_*`** (primary AI on Azure credits) — see `docs/AZURE_OPENAI_SETUP.md`, or **`XAI_API_KEY`** as fallback.
 2. Set Supabase vars for sign-in + usage tracking (see SUPABASE_SETUP.md).
 3. Optional: **`GROQ_API_KEY`**, **`PREMIUM_EMAILS`**, **`PREMIUM_CONTACT_EMAIL`**.
 
