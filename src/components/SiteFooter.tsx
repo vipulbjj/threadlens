@@ -34,6 +34,9 @@ export function SiteFooter({ className = "" }: { className?: string }) {
         . Parsing stays in your browser; AI is optional.
       </p>
       <nav className="mt-6 flex flex-wrap justify-center gap-4 text-xs">
+        <Link href="/privacy" className="hover:text-[var(--color-foreground)]">
+          Privacy
+        </Link>
         <Link href="/pricing" className="hover:text-[var(--color-foreground)]">
           Pricing
         </Link>

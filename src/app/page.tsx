@@ -125,8 +125,11 @@ export default function Home() {
               <div>
                 <h3 className="text-lg font-semibold">Privacy, honestly</h3>
                 <p className="mt-2 text-sm text-[var(--color-muted-foreground)] max-w-xl">
-                  Parsing is local. Optional AI (xAI on the server) sends only the messages needed for your question. Premium
-                  unlocks full imports and unlimited AI via email. Not therapy, legal, or relationship advice.
+                  Parsing and pattern stats stay on your device. Optional AI sends a limited excerpt when you ask — not your
+                  whole export.{" "}
+                  <Link href="/privacy" className="tl-accent hover:underline">
+                    How privacy works →
+                  </Link>
                 </p>
               </div>
             </div>
