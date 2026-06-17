@@ -6,6 +6,8 @@ export interface ParsedMessage {
   time: string;
   sender: string;
   message: string;
+  /** true when the export entry is a voice/audio note, not a text message */
+  isAudio?: boolean;
 }
 
 export class ParseError extends Error {
@@ -20,9 +22,10 @@ const SKIP_SNIPPETS = [
   "<Media omitted>",
   "image omitted",
   "video omitted",
-  "audio omitted",
   "sticker omitted",
 ];
+
+const AUDIO_SNIPPETS = ["audio omitted"];
 
 function shouldSkipMessage(message: string) {
   const trimmed = message.trim();
@@ -30,8 +33,17 @@ function shouldSkipMessage(message: string) {
   return SKIP_SNIPPETS.some((s) => trimmed.includes(s));
 }
 
+function isAudioMessage(message: string) {
+  const trimmed = message.trim();
+  return AUDIO_SNIPPETS.some((s) => trimmed.includes(s));
+}
+
 function pushMessage(messages: ParsedMessage[], row: ParsedMessage) {
   if (shouldSkipMessage(row.message)) return;
+  if (isAudioMessage(row.message)) {
+    messages.push({ ...row, message: "🎤 Voice note", isAudio: true });
+    return;
+  }
   messages.push(row);
 }
 
@@ -190,11 +202,13 @@ export function getChatStats(messages: ParsedMessage[]) {
     const senderMsgs = messages.filter((m) => m.sender === sender);
     const sorryCount = senderMsgs.filter((m) => /\b(sorry|apologize|apologies|my bad)\b/i.test(m.message)).length;
     const senderChars = senderMsgs.reduce((acc, m) => acc + m.message.length, 0);
+    const audioCount = senderMsgs.filter((m) => m.isAudio).length;
     return {
       sender,
       count: senderMsgs.length,
       avgLength: senderMsgs.length ? Math.round(senderChars / senderMsgs.length) : 0,
       sorryCount,
+      audioCount,
       totalChars: senderChars,
     };
   });

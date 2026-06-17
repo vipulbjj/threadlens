@@ -3,7 +3,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import { Send, ArrowLeft } from "lucide-react";
+import { Send, ArrowLeft, Key } from "lucide-react";
 import { SiteNavActions } from "@/components/SiteNavActions";
 import { useChatStore } from "@/lib/store";
 import { buildThreadInsights, buildFullThreadStats } from "@/lib/insights";
@@ -16,6 +16,8 @@ import { AiQuotaHint } from "@/components/AiQuotaHint";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { sliceMessagesForAiPayload } from "@/lib/ai-guard";
 import { tierFromPremium, readCachedTier } from "@/lib/tiers";
+import { ByokDialog, ByokBadge } from "@/components/ByokDialog";
+import { useByokStore } from "@/lib/byok-store";
 
 interface ChatTurn {
   role: "user" | "assistant";
@@ -57,6 +59,7 @@ export default function ChatPage() {
   const prompts = getPromptsForUseCase(session?.useCase);
 
   const [input, setInput] = useState("");
+  const [showByok, setShowByok] = useState(false);
   /** Collapsed by default on phones so chat + sign-in stay in view (insights are long). */
   const [showInsights, setShowInsights] = useState(() =>
     typeof window !== "undefined" ? window.matchMedia("(min-width: 768px)").matches : true
@@ -69,7 +72,9 @@ export default function ChatPage() {
   const { account, loading: accountLoading, refresh: refreshAccount } = useAccount();
   const bottomRef = useRef<HTMLDivElement>(null);
   const authRequired = isSupabaseConfigured();
-  const needsSignIn = authRequired && !accountLoading && !account?.authenticated;
+  const byokConfig = useByokStore((s) => s.config);
+  // When user has their own key, they bypass sign-in requirement
+  const needsSignIn = authRequired && !byokConfig && !accountLoading && !account?.authenticated;
 
   useEffect(() => {
     if (sessionId) setActiveSession(sessionId);
@@ -117,6 +122,12 @@ export default function ChatPage() {
           question: userMessage,
           useCase: session.useCase,
           threadStats: buildFullThreadStats(session.messages, session.useCase),
+          // BYOK: pass key client-side, never stored server-side
+          ...(byokConfig ? {
+            byokApiKey: byokConfig.apiKey,
+            byokProvider: byokConfig.provider,
+            byokModel: byokConfig.model,
+          } : {}),
         }),
       });
       const data = await res.json();
@@ -153,6 +164,7 @@ export default function ChatPage() {
 
   return (
     <div className="flex flex-col h-[100dvh] min-h-0 bg-[var(--color-background)] text-[var(--color-foreground)] pb-[calc(4rem+env(safe-area-inset-bottom))] md:pb-0">
+      {showByok && <ByokDialog onClose={() => setShowByok(false)} />}
       <header className="flex items-center gap-2 border-b border-[var(--color-border)] px-3 py-2.5 shrink-0 sm:gap-3 sm:px-4 sm:py-3">
         <Link href="/dashboard" className="text-[var(--color-muted-foreground)] hover:text-[var(--color-foreground)] shrink-0 p-1" aria-label="Back">
           <ArrowLeft className="h-5 w-5" />
@@ -170,6 +182,15 @@ export default function ChatPage() {
         >
           <span className="hidden sm:inline">{showInsights ? "Hide signals" : "Signals"}</span>
           <span className="sm:hidden">{showInsights ? "Hide" : "Stats"}</span>
+        </button>
+        <ByokBadge onClick={() => setShowByok(true)} />
+        <button
+          type="button"
+          onClick={() => setShowByok(true)}
+          title="Use your own API key"
+          className="shrink-0 text-[var(--color-muted-foreground)] hover:text-[var(--color-foreground)] min-h-10 px-2 py-2 rounded-md border border-[var(--color-border)] hover:border-emerald-500/40 transition-colors"
+        >
+          <Key className="h-4 w-4" />
         </button>
         <SiteNavActions />
       </header>

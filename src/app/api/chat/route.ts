@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import OpenAI from "openai";
 import { resolveAiProvider, systemPromptForUseCase } from "@/lib/ai-provider";
 import {
   buildBoundedContext,
@@ -10,6 +11,7 @@ import { resolveAccount, incrementAiUsage } from "@/lib/account";
 import { createClient } from "@/lib/supabase/server";
 import { isSupabaseConfigured, premiumContactEmail } from "@/lib/supabase/config";
 import { tierFromPremium } from "@/lib/tiers";
+import { BYOK_PROVIDER_OPTIONS } from "@/lib/byok-store";
 
 /** Vercel defaults to ~10s without this; large premium threads often need 20–45s for xAI. */
 export const maxDuration = 60;
@@ -60,6 +62,64 @@ export async function POST(req: Request) {
     }
 
     const body = await req.json();
+
+    // ─── BYOK: user-supplied API key bypasses server provider + auth ───────────
+    const byokApiKey = typeof body.byokApiKey === "string" ? body.byokApiKey.trim() : null;
+    const byokProvider = typeof body.byokProvider === "string" ? body.byokProvider : null;
+    const byokModel = typeof body.byokModel === "string" ? body.byokModel.trim() : null;
+
+    if (byokApiKey && byokProvider) {
+      const providerMeta = BYOK_PROVIDER_OPTIONS.find((p) => p.id === byokProvider);
+      if (!providerMeta) {
+        return NextResponse.json({ error: "Unknown BYOK provider." }, { status: 400 });
+      }
+      const byokClient = new OpenAI({
+        apiKey: byokApiKey,
+        ...(providerMeta.baseURL ? { baseURL: providerMeta.baseURL } : {}),
+      });
+      const model = byokModel || providerMeta.defaultModel;
+      const messages = body.messages;
+      const question = typeof body.question === "string" ? body.question.trim() : "";
+      const useCase = typeof body.useCase === "string" ? body.useCase : undefined;
+      const threadStats = typeof body.threadStats === "string" ? body.threadStats.slice(0, 8_000) : null;
+      const totalMessageCount = typeof body.totalMessageCount === "number" ? body.totalMessageCount : messages?.length ?? 0;
+      if (!messages || !Array.isArray(messages) || messages.length === 0) {
+        return NextResponse.json({ error: "No chat messages provided." }, { status: 400 });
+      }
+      if (!question) {
+        return NextResponse.json({ error: "Ask a question about this thread." }, { status: 400 });
+      }
+      const bounded = buildBoundedContext(messages, "free");
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), AI_ABORT_MS);
+      try {
+        const completion = await byokClient.chat.completions.create(
+          {
+            model,
+            messages: [
+              { role: "system", content: systemPromptForUseCase(useCase) },
+              {
+                role: "user",
+                content: [
+                  threadStats ? `Thread-wide statistics:\n${threadStats}` : null,
+                  `Recent messages:\n${bounded.context}`,
+                  `Question: ${question}`,
+                ].filter(Boolean).join("\n\n"),
+              },
+            ],
+            max_tokens: 800,
+            temperature: 0.6,
+          },
+          { signal: controller.signal }
+        );
+        const answer = completion.choices[0]?.message?.content?.trim() || "No response from the model.";
+        return NextResponse.json({ answer, provider: `${providerMeta.label} (your key)` });
+      } finally {
+        clearTimeout(timeout);
+      }
+    }
+    // ──────────────────────────────────────────────────────────────────────────
+
     const messages = body.messages;
     const totalMessageCount =
       typeof body.totalMessageCount === "number" && body.totalMessageCount > 0
